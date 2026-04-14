@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Logo Preview 4</title>
+  <style>
+    body { background: #080810; display: flex; gap: 60px; align-items: center; justify-content: center; min-height: 100vh; font-family: sans-serif; flex-wrap: wrap; padding: 60px; }
+    .card { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+    .label { color: #7878a0; font-size: 13px; text-align: center; }
+    .sizes { display: flex; gap: 20px; align-items: flex-end; }
+    .box { background: #111120; border: 1px solid #252540; border-radius: 20px; padding: 28px; display: flex; align-items: center; justify-content: center; }
+    .box-dark { background: #080810; border-color: #1a1a2e; }
+  </style>
+</head>
+<body>
+
+<!-- Вариант A: Градиентная заливка + белый микрофон -->
+<div class="card">
+  <div class="sizes">
+
+    <!-- 96px -->
+    <div class="box">
+      <svg width="96" height="96" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="pgA" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C6FFF"/>
+            <stop offset="100%" stop-color="#FF6584"/>
+          </linearGradient>
+          <clipPath id="headA">
+            <rect x="22" y="8" width="36" height="40" rx="16"/>
+          </clipPath>
+        </defs>
+        <!-- Pentagon: flat top, point bottom -->
+        <path d="M4 10 L76 10 L76 52 L40 76 L4 52 Z" fill="url(#pgA)" rx="4"/>
+        <!-- Pentagon border glow -->
+        <path d="M4 10 L76 10 L76 52 L40 76 L4 52 Z" fill="none" stroke="white" stroke-width="1" opacity="0.2"/>
+
+        <!-- Mic head shape -->
+        <rect x="22" y="8" width="36" height="40" rx="16" fill="white"/>
+
+        <!-- Grille bars clipped inside head -->
+        <g clip-path="url(#headA)">
+          <rect x="22" y="8" width="36" height="40" rx="16" fill="white"/>
+          <!-- Dark grille slots -->
+          <rect x="18" y="14" width="44" height="4" rx="2" fill="#7C6FFF" opacity="0.25"/>
+          <rect x="18" y="21" width="44" height="4" rx="2" fill="#7C6FFF" opacity="0.25"/>
+          <rect x="18" y="28" width="44" height="4" rx="2" fill="#7C6FFF" opacity="0.25"/>
+          <rect x="18" y="35" width="44" height="4" rx="2" fill="#7C6FFF" opacity="0.25"/>
+          <rect x="18" y="42" width="44" height="4" rx="2" fill="#7C6FFF" opacity="0.25"/>
+        </g>
+        <!-- Head outline -->
+        <rect x="22" y="8" width="36" height="40" rx="16" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"/>
+
+        <!-- Body -->
+        <rect x="28" y="48" width="24" height="16" rx="5" fill="white" opacity="0.95"/>
+        <!-- Body detail line -->
+        <line x1="28" y1="54" x2="52" y2="54" stroke="#7C6FFF" stroke-width="1.5" opacity="0.3"/>
+        <!-- Small dot on body -->
+        <circle cx="40" cy="59" r="2" fill="#7C6FFF" opacity="0.4"/>
+      </svg>
+    </div>
+
+    <!-- 48px -->
+    <div class="box">
+      <svg width="48" height="48" viewBox="0 0 80 80" fill="none">
+        <defs>
+          <linearGradient id="pgA2" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C6FFF"/>
+            <stop offset="100%" stop-color="#FF6584"/>
+          </linearGradient>
+          <clipPath id="headA2"><rect x="22" y="8" width="36" height="40" rx="16"/></clipPath>
+        </defs>
+        <path d="M4 10 L76 10 L76 52 L40 76 L4 52 Z" fill="url(#pgA2)"/>
+        <rect x="22" y="8" width="36" height="40" rx="16" fill="white"/>
+        <g clip-path="url(#headA2)">
+          <rect x="18" y="14" width="44" height="4" rx="2" fill="#7C6FFF" opacity="0.25"/>
+          <rect x="18" y="21" width="44" height="4" rx="2" fill="#7C6FFF" opacity="0.25"/>
+          <rect x="18" y="28" width="44" height="4" rx="2" fill="#7C6FFF" opacity="0.25"/>
+          <rect x="18" y="35" width="44" height="4" rx="2" fill="#7C6FFF" opacity="0.25"/>
+          <rect x="18" y="42" width="44" height="4" rx="2" fill="#7C6FFF" opacity="0.25"/>
+        </g>
+        <rect x="28" y="48" width="24" height="16" rx="5" fill="white" opacity="0.95"/>
+      </svg>
+    </div>
+
+    <!-- 32px favicon -->
+    <div class="box">
+      <svg width="32" height="32" viewBox="0 0 80 80" fill="none">
+        <defs>
+          <linearGradient id="pgA3" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C6FFF"/>
+            <stop offset="100%" stop-color="#FF6584"/>
+          </linearGradient>
+        </defs>
+        <path d="M4 10 L76 10 L76 52 L40 76 L4 52 Z" fill="url(#pgA3)"/>
+        <rect x="22" y="8" width="36" height="40" rx="16" fill="white"/>
+        <rect x="28" y="48" width="24" height="16" rx="5" fill="white"/>
+      </svg>
+    </div>
+  </div>
+  <div class="label">A — Пентагон + Белый микрофон (с грилем)</div>
+</div>
+
+<!-- Вариант B: Тёмный фон, контурный микрофон с градиентом -->
+<div class="card">
+  <div class="sizes">
+    <div class="box">
+      <svg width="96" height="96" viewBox="0 0 80 80" fill="none">
+        <defs>
+          <linearGradient id="pgB" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C6FFF"/>
+            <stop offset="100%" stop-color="#FF6584"/>
+          </linearGradient>
+          <clipPath id="headB"><rect x="22" y="8" width="36" height="40" rx="16"/></clipPath>
+        </defs>
+        <!-- Pentagon dark fill + gradient stroke -->
+        <path d="M4 10 L76 10 L76 52 L40 76 L4 52 Z" fill="#0d0d1c"/>
+        <path d="M4 10 L76 10 L76 52 L40 76 L4 52 Z" fill="none" stroke="url(#pgB)" stroke-width="2.5"/>
+
+        <!-- Mic head gradient fill -->
+        <rect x="22" y="8" width="36" height="40" rx="16" fill="url(#pgB)"/>
+        <!-- Grille bars -->
+        <g clip-path="url(#headB)">
+          <rect x="18" y="14" width="44" height="4.5" rx="2" fill="#0d0d1c" opacity="0.45"/>
+          <rect x="18" y="21" width="44" height="4.5" rx="2" fill="#0d0d1c" opacity="0.45"/>
+          <rect x="18" y="28" width="44" height="4.5" rx="2" fill="#0d0d1c" opacity="0.45"/>
+          <rect x="18" y="35" width="44" height="4.5" rx="2" fill="#0d0d1c" opacity="0.45"/>
+          <rect x="18" y="42" width="44" height="4.5" rx="2" fill="#0d0d1c" opacity="0.45"/>
+        </g>
+        <rect x="22" y="8" width="36" height="40" rx="16" fill="none" stroke="white" stroke-width="1" opacity="0.3"/>
+
+        <!-- Body -->
+        <rect x="28" y="48" width="24" height="16" rx="5" fill="url(#pgB)" opacity="0.8"/>
+        <line x1="28" y1="55" x2="52" y2="55" stroke="white" stroke-width="1.5" opacity="0.25"/>
+        <circle cx="40" cy="60" r="2.5" fill="white" opacity="0.4"/>
+      </svg>
+    </div>
+
+    <div class="box">
+      <svg width="48" height="48" viewBox="0 0 80 80" fill="none">
+        <defs>
+          <linearGradient id="pgB2" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C6FFF"/>
+            <stop offset="100%" stop-color="#FF6584"/>
+          </linearGradient>
+          <clipPath id="headB2"><rect x="22" y="8" width="36" height="40" rx="16"/></clipPath>
+        </defs>
+        <path d="M4 10 L76 10 L76 52 L40 76 L4 52 Z" fill="#0d0d1c"/>
+        <path d="M4 10 L76 10 L76 52 L40 76 L4 52 Z" fill="none" stroke="url(#pgB2)" stroke-width="2.5"/>
+        <rect x="22" y="8" width="36" height="40" rx="16" fill="url(#pgB2)"/>
+        <g clip-path="url(#headB2)">
+          <rect x="18" y="14" width="44" height="4.5" rx="2" fill="#0d0d1c" opacity="0.45"/>
+          <rect x="18" y="21" width="44" height="4.5" rx="2" fill="#0d0d1c" opacity="0.45"/>
+          <rect x="18" y="28" width="44" height="4.5" rx="2" fill="#0d0d1c" opacity="0.45"/>
+          <rect x="18" y="35" width="44" height="4.5" rx="2" fill="#0d0d1c" opacity="0.45"/>
+          <rect x="18" y="42" width="44" height="4.5" rx="2" fill="#0d0d1c" opacity="0.45"/>
+        </g>
+        <rect x="28" y="48" width="24" height="16" rx="5" fill="url(#pgB2)" opacity="0.8"/>
+      </svg>
+    </div>
+
+    <div class="box">
+      <svg width="32" height="32" viewBox="0 0 80 80" fill="none">
+        <defs>
+          <linearGradient id="pgB3" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C6FFF"/>
+            <stop offset="100%" stop-color="#FF6584"/>
+          </linearGradient>
+        </defs>
+        <path d="M4 10 L76 10 L76 52 L40 76 L4 52 Z" fill="#0d0d1c"/>
+        <path d="M4 10 L76 10 L76 52 L40 76 L4 52 Z" fill="none" stroke="url(#pgB3)" stroke-width="3"/>
+        <rect x="22" y="8" width="36" height="40" rx="16" fill="url(#pgB3)"/>
+        <rect x="28" y="48" width="24" height="16" rx="5" fill="url(#pgB3)" opacity="0.8"/>
+      </svg>
+    </div>
+  </div>
+  <div class="label">B — Тёмный пентагон + Градиентный микрофон</div>
+</div>
+
+</body>
+</html>

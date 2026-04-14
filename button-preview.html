@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Button Color Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Space Grotesk', sans-serif; background: #080810; color: #eeeef8; padding: 60px 48px; }
+
+    h1 { font-family: 'Syne', sans-serif; font-size: 13px; color: #4040a0; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 52px; }
+
+    .row { display: flex; align-items: center; gap: 48px; margin-bottom: 52px; }
+    .label { width: 220px; flex-shrink: 0; }
+    .label strong { display: block; font-size: 14px; color: #fff; margin-bottom: 4px; }
+    .label span { font-size: 12px; color: #44446a; line-height: 1.5; }
+    .pair { display: flex; gap: 20px; align-items: center; }
+
+    /* ── BASE ── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 13px 32px; font-size: 13px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      font-family: inherit; cursor: pointer; border: none;
+      position: relative; overflow: hidden; border-radius: 8px;
+      background: transparent; white-space: nowrap;
+    }
+    .btn::before, .btn::after {
+      content: ''; position: absolute;
+      width: 10px; height: 10px;
+      transition: width .35s cubic-bezier(.4,0,.2,1), height .35s cubic-bezier(.4,0,.2,1);
+      pointer-events: none;
+    }
+    .btn:hover::before, .btn:hover::after { width: 100%; height: 100%; }
+
+    /* PRIMARY base */
+    .primary { background: #7C6FFF; color: #fff; }
+
+    /* OUTLINE base */
+    .outline { color: #eeeef8; }
+
+    /* ── ВАРИАНТ A: текущий ── */
+    .a.primary::before { top:0;left:0; border-top:3px solid rgba(255,255,255,0.55); border-left:3px solid rgba(255,255,255,0.55); border-radius:8px 0 0 0; }
+    .a.primary::after  { bottom:0;right:0; border-bottom:3px solid rgba(255,255,255,0.55); border-right:3px solid rgba(255,255,255,0.55); border-radius:0 0 8px 0; }
+    .a.outline::before { top:0;left:0; border-top:3px solid #7C6FFF; border-left:3px solid #7C6FFF; border-radius:8px 0 0 0; }
+    .a.outline::after  { bottom:0;right:0; border-bottom:3px solid #7C6FFF; border-right:3px solid #7C6FFF; border-radius:0 0 8px 0; }
+
+    /* ── ВАРИАНТ B: моя рекомендация ── */
+    .b.primary::before { top:0;left:0; border-top:3px solid rgba(255,255,255,0.82); border-left:3px solid rgba(255,255,255,0.82); border-radius:8px 0 0 0; }
+    .b.primary::after  { bottom:0;right:0; border-bottom:3px solid rgba(255,255,255,0.82); border-right:3px solid rgba(255,255,255,0.82); border-radius:0 0 8px 0; }
+    .b.outline::before { top:0;left:0; border-top:3px solid rgba(255,255,255,0.38); border-left:3px solid rgba(255,255,255,0.38); border-radius:8px 0 0 0; }
+    .b.outline::after  { bottom:0;right:0; border-bottom:3px solid rgba(255,255,255,0.38); border-right:3px solid rgba(255,255,255,0.38); border-radius:0 0 8px 0; }
+
+    /* ── ВАРИАНТ C: розовый акцент ── */
+    .c.primary::before { top:0;left:0; border-top:3px solid #FF6584; border-left:3px solid #FF6584; border-radius:8px 0 0 0; }
+    .c.primary::after  { bottom:0;right:0; border-bottom:3px solid #FF6584; border-right:3px solid #FF6584; border-radius:0 0 8px 0; }
+    .c.outline::before { top:0;left:0; border-top:3px solid #FF6584; border-left:3px solid #FF6584; border-radius:8px 0 0 0; }
+    .c.outline::after  { bottom:0;right:0; border-bottom:3px solid #FF6584; border-right:3px solid #FF6584; border-radius:0 0 8px 0; }
+
+    /* ── ВАРИАНТ D: светлый фиолетовый ── */
+    .d.primary::before { top:0;left:0; border-top:3px solid #c4beff; border-left:3px solid #c4beff; border-radius:8px 0 0 0; }
+    .d.primary::after  { bottom:0;right:0; border-bottom:3px solid #c4beff; border-right:3px solid #c4beff; border-radius:0 0 8px 0; }
+    .d.outline::before { top:0;left:0; border-top:3px solid #a89fff; border-left:3px solid #a89fff; border-radius:8px 0 0 0; }
+    .d.outline::after  { bottom:0;right:0; border-bottom:3px solid #a89fff; border-right:3px solid #a89fff; border-radius:0 0 8px 0; }
+
+    /* ── ВАРИАНТ E: голубой (electric) ── */
+    .e.primary::before { top:0;left:0; border-top:3px solid #5de0ff; border-left:3px solid #5de0ff; border-radius:8px 0 0 0; }
+    .e.primary::after  { bottom:0;right:0; border-bottom:3px solid #5de0ff; border-right:3px solid #5de0ff; border-radius:0 0 8px 0; }
+    .e.outline::before { top:0;left:0; border-top:3px solid #5de0ff; border-left:3px solid #5de0ff; border-radius:8px 0 0 0; }
+    .e.outline::after  { bottom:0;right:0; border-bottom:3px solid #5de0ff; border-right:3px solid #5de0ff; border-radius:0 0 8px 0; }
+
+    /* ── ВАРИАНТ F: один цвет — белый на обоих ── */
+    .f.primary::before { top:0;left:0; border-top:3px solid rgba(255,255,255,0.82); border-left:3px solid rgba(255,255,255,0.82); border-radius:8px 0 0 0; }
+    .f.primary::after  { bottom:0;right:0; border-bottom:3px solid rgba(255,255,255,0.82); border-right:3px solid rgba(255,255,255,0.82); border-radius:0 0 8px 0; }
+    .f.outline::before { top:0;left:0; border-top:3px solid rgba(255,255,255,0.82); border-left:3px solid rgba(255,255,255,0.82); border-radius:8px 0 0 0; }
+    .f.outline::after  { bottom:0;right:0; border-bottom:3px solid rgba(255,255,255,0.82); border-right:3px solid rgba(255,255,255,0.82); border-radius:0 0 8px 0; }
+
+    .divider { border: none; border-top: 1px solid #111120; margin: 8px 0 44px; }
+  </style>
+</head>
+<body>
+
+<h1>— Цвет обводки кнопок</h1>
+
+<div class="row">
+  <div class="label">
+    <strong>A — Текущий</strong>
+    <span>Белый на primary, фиолетовый на outline</span>
+  </div>
+  <div class="pair">
+    <button class="btn primary a">Попробовать бесплатно</button>
+    <button class="btn outline a">Войти</button>
+  </div>
+</div>
+
+<div class="row">
+  <div class="label">
+    <strong>B — Рекомендация ⭐</strong>
+    <span>Яркий белый на primary, тихий белый на outline — иерархия CTA</span>
+  </div>
+  <div class="pair">
+    <button class="btn primary b">Попробовать бесплатно</button>
+    <button class="btn outline b">Войти</button>
+  </div>
+</div>
+
+<div class="row">
+  <div class="label">
+    <strong>C — Розовый акцент</strong>
+    <span>Розовый #FF6584 — уже есть на сайте в градиентах</span>
+  </div>
+  <div class="pair">
+    <button class="btn primary c">Попробовать бесплатно</button>
+    <button class="btn outline c">Войти</button>
+  </div>
+</div>
+
+<div class="row">
+  <div class="label">
+    <strong>D — Светлый фиолетовый</strong>
+    <span>Мягче основного акцента, в той же гамме</span>
+  </div>
+  <div class="pair">
+    <button class="btn primary d">Попробовать бесплатно</button>
+    <button class="btn outline d">Войти</button>
+  </div>
+</div>
+
+<div class="row">
+  <div class="label">
+    <strong>E — Electric Blue</strong>
+    <span>Холодный голубой — резкий контраст к фиолетовому</span>
+  </div>
+  <div class="pair">
+    <button class="btn primary e">Попробовать бесплатно</button>
+    <button class="btn outline e">Войти</button>
+  </div>
+</div>
+
+<div class="row">
+  <div class="label">
+    <strong>F — Белый на обоих</strong>
+    <span>Единая система — оба типа с белой обводкой</span>
+  </div>
+  <div class="pair">
+    <button class="btn primary f">Попробовать бесплатно</button>
+    <button class="btn outline f">Войти</button>
+  </div>
+</div>
+
+</body>
+</html>

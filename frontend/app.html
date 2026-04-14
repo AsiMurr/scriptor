@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scriptor — Приложение</title>
+  <link rel="icon" type="image/svg+xml" href="/static/logo.svg">
+  <link rel="stylesheet" href="/static/style.css?v=2" />
+</head>
+<body class="app-page">
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="logo"><img src="/static/logo.svg" style="width:28px;height:28px;vertical-align:middle"> Scriptor</a>
+      <div class="nav-links nav-app">
+        <a href="/" class="btn btn-primary btn-sm">← На главную</a>
+        <div class="account-trigger" id="account-widget" style="display:none">
+          <span class="account-trigger-mins" id="widget-remaining">—</span>
+          <div class="account-widget-bar">
+            <div class="account-widget-fill" id="widget-fill"></div>
+          </div>
+          <div class="account-dropdown">
+            <div class="account-widget-row">
+              <span class="account-widget-label">Осталось минут</span>
+              <span class="account-widget-mins" id="widget-remaining-detail">—</span>
+            </div>
+            <div class="account-widget-row" style="margin-top:4px">
+              <span class="account-widget-label">Баланс</span>
+              <span class="account-widget-balance" id="widget-balance">0,00 ₽</span>
+              <a href="/topup" class="account-widget-topup">Пополнить</a>
+            </div>
+          </div>
+        </div>
+        <span id="user-email" class="user-email"></span>
+        <button class="btn btn-primary btn-sm" onclick="logout()">Выйти</button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="guest-banner" style="display:none" class="guest-banner">
+    <span>Гостевой режим — <b>10 мин</b>. 🎁 Зарегистрируйтесь и получите <b>20 мин</b> бесплатно.<br>И получите доступ ко всем дополнительным функциям.</span>
+    <a href="/?modal=register" class="btn btn-sm btn-primary">Зарегистрироваться →</a>
+    <button class="guest-banner-close" onclick="this.closest('.guest-banner').style.display='none'">✕</button>
+  </div>
+
+  <main class="app-main">
+
+    <!-- UPLOAD PANEL -->
+    <section class="upload-panel">
+      <h2>Транскрибация аудио</h2>
+
+      <div class="drop-zone" id="drop-zone">
+        <div class="drop-icon">🎵</div>
+        <p class="drop-text">Перетащи файл сюда или</p>
+        <button class="btn btn-primary" id="pick-btn">Выбрать файл</button>
+        <p class="drop-formats">MP3, WAV, OGG, MP4, M4A, WebM · до 25 МБ</p>
+        <div class="record-row">
+          <button class="btn btn-record" id="record-btn" onclick="toggleRecord()"><span class="mic-icon">🎙</span> Записать с микрофона</button>
+          <span class="record-timer" id="record-timer" style="display:none">00:00</span>
+        </div>
+        <div id="record-viz" style="display:none" class="record-viz">
+          <canvas id="record-canvas" width="260" height="36"></canvas>
+        </div>
+        <input type="file" id="file-input" accept=".mp3,.wav,.ogg,.mp4,.m4a,.webm,.flac" style="display:none" />
+      </div>
+
+      <!-- Selected file info -->
+      <div class="file-info" id="file-info" style="display:none">
+        <span class="file-name" id="file-name"></span>
+        <span class="file-size" id="file-size"></span>
+        <button class="btn btn-sm btn-danger" onclick="clearFile()">✕</button>
+      </div>
+
+      <button class="btn btn-primary btn-lg btn-full" id="transcribe-btn" onclick="doTranscribe()" disabled>
+        Транскрибировать
+      </button>
+
+      <!-- Progress -->
+      <div class="progress-wrap" id="progress-wrap" style="display:none">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p class="progress-text" id="progress-text">Загрузка файла…</p>
+      </div>
+
+      <!-- Result -->
+      <div class="result-wrap" id="result-wrap" style="display:none">
+        <div class="result-header">
+          <h3>Результат</h3>
+          <div class="result-actions" id="download-buttons">
+            <button class="btn btn-sm btn-primary" onclick="copyText()">📋 Копировать</button>
+            <button class="btn btn-sm btn-primary" onclick="downloadText('txt')">TXT</button>
+            <button class="btn btn-sm btn-primary" onclick="downloadText('docx')">Word</button>
+            <button class="btn btn-sm btn-primary" onclick="downloadText('pdf')">PDF</button>
+            <button class="btn btn-sm btn-primary" onclick="downloadText('xlsx')">Excel</button>
+          </div>
+        </div>
+        <textarea class="result-text" id="result-text" oninput="onTextEdit()"></textarea>
+        <div id="speaker-panel" style="display:none" class="speaker-panel">
+          <div class="speaker-panel-title">Переименовать спикеров</div>
+          <div id="speaker-inputs" class="speaker-inputs"></div>
+        </div>
+        <div class="result-footer">
+          <div class="result-meta" id="result-meta"></div>
+          <button class="btn btn-sm btn-primary save-btn" id="save-btn" style="display:none" onclick="saveEdit()">Сохранить</button>
+        </div>
+      </div>
+
+      <div class="error-wrap" id="error-wrap" style="display:none">
+        <p class="error-msg" id="error-msg"></p>
+      </div>
+    </section>
+
+    <!-- HISTORY SIDEBAR -->
+    <aside class="history-panel">
+      <div class="history-head">
+        <h3>История</h3>
+        <input class="history-search" id="history-search" type="text" placeholder="Поиск…" oninput="filterHistory()" />
+      </div>
+      <div id="history-list" class="history-list">
+        <p class="history-empty">Здесь появятся ваши транскрипции</p>
+      </div>
+    </aside>
+
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

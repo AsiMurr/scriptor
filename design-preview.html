@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Design Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: #080810;
+      color: #eeeef8;
+    }
+
+    /* ── ПЕРЕКЛЮЧАТЕЛЬ ── */
+    .switcher {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      background: #111120; border: 1px solid #252540; border-radius: 12px;
+      display: flex; gap: 4px; padding: 4px; z-index: 999;
+    }
+    .switcher button {
+      padding: 8px 20px; border-radius: 8px; border: none; cursor: pointer;
+      font-family: inherit; font-size: 14px; font-weight: 600; transition: all .2s;
+      background: transparent; color: #7878a0;
+    }
+    .switcher button.active { background: #7C6FFF; color: #fff; }
+
+    /* ── СЕКЦИИ ── */
+    .version { display: none; padding: 100px 28px 80px; max-width: 1140px; margin: 0 auto; }
+    .version.active { display: block; }
+
+    /* ══════════════════════════════════════════════
+       СТАРЫЙ СТИЛЬ
+    ══════════════════════════════════════════════ */
+    .old .section-header { text-align: center; margin-bottom: 56px; }
+    .old .section-tag {
+      display: inline-block;
+      background: rgba(124,111,255,0.12); border: 1px solid rgba(124,111,255,0.25);
+      color: #a89fff; font-size: 13px; font-weight: 600;
+      padding: 5px 16px; border-radius: 20px; margin-bottom: 16px;
+    }
+    .old .section-header h2 { font-size: clamp(28px,4vw,42px); font-weight: 800; font-family: 'Syne', sans-serif; }
+    .old .features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    .old .feature-card {
+      background: #111120; border: 1px solid #252540;
+      border-radius: 14px; padding: 30px 24px; transition: all .2s;
+    }
+    .old .feature-card:hover { border-color: rgba(124,111,255,0.4); transform: translateY(-3px); }
+    .old .feature-icon { font-size: 32px; margin-bottom: 14px; }
+    .old .feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .old .feature-card p { font-size: 14px; color: #7878a0; line-height: 1.6; }
+
+    /* ══════════════════════════════════════════════
+       НОВЫЙ СТИЛЬ
+    ══════════════════════════════════════════════ */
+
+    /* Заголовок секции */
+    .new .section-header { margin-bottom: 64px; }
+    .new .section-tag {
+      display: block;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: #4040a0;
+      margin-bottom: 20px;
+    }
+    .new .section-header h2 {
+      font-size: clamp(32px,4vw,52px); font-weight: 800;
+      font-family: 'Syne', sans-serif; line-height: 1.05;
+      color: #fff;
+    }
+    .new .section-header h2 em {
+      font-style: normal;
+      background: linear-gradient(135deg, #7C6FFF, #FF6584);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* Сетка карточек */
+    .new .features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: #1c1c2e; border: 1px solid #1c1c2e; border-radius: 16px; overflow: hidden; }
+
+    .new .feature-card {
+      background: #080810; padding: 36px 28px;
+      transition: background .25s;
+      position: relative; overflow: hidden;
+    }
+    .new .feature-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, #7C6FFF, #FF6584);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform .35s ease;
+    }
+    .new .feature-card:hover { background: #0d0d1a; }
+    .new .feature-card:hover::after { transform: scaleX(1); }
+
+    /* Номер вместо emoji */
+    .new .feature-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+      color: #7C6FFF; margin-bottom: 28px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .new .feature-num::after {
+      content: '';
+      flex: 1; max-width: 32px; height: 1px;
+      background: #252540;
+    }
+
+    /* Волна — SVG-заглушка */
+    .new .wave-icon {
+      margin-bottom: 20px; display: flex; align-items: flex-end; gap: 3px; height: 28px;
+    }
+    .new .wave-icon span {
+      display: block; width: 4px; border-radius: 2px;
+      background: linear-gradient(180deg, #7C6FFF 0%, rgba(124,111,255,0.2) 100%);
+    }
+
+    .new .feature-card h3 {
+      font-size: 16px; font-weight: 700; margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .new .feature-card p { font-size: 13px; color: #5a5a80; line-height: 1.65; }
+
+    /* Метка снизу */
+    .new .feature-tag {
+      display: inline-block; margin-top: 20px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #3a3a60;
+      border-top: 1px solid #1c1c2e; padding-top: 14px; width: 100%;
+    }
+
+    @media (max-width: 860px) {
+      .old .features-grid, .new .features-grid { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 560px) {
+      .old .features-grid, .new .features-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="switcher">
+    <button class="active" onclick="show('old', this)">Сейчас</button>
+    <button onclick="show('new', this)">Новый стиль</button>
+  </div>
+
+  <!-- СТАРЫЙ -->
+  <div class="version old active">
+    <div class="section-header">
+      <div class="section-tag">Возможности</div>
+      <h2>Всё что нужно для транскрибации</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Молниеносно</h3>
+        <p>1 минута аудио обрабатывается за ~10 секунд. Не нужно ждать.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Высокая точность</h3>
+        <p>Распознаёт технические термины, имена и акценты с высокой точностью.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👥</div>
+        <h3>Разделение спикеров</h3>
+        <p>Автоматически определяет кто говорит — идеально для интервью и совещаний.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📄</div>
+        <h3>Экспорт</h3>
+        <p>Скачивай результат в TXT, Word, PDF или Excel одним кликом.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌍</div>
+        <h3>50+ языков</h3>
+        <p>Русский, английский, украинский и другие — определяется автоматически.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Безопасно</h3>
+        <p>Аудиофайлы не хранятся на сервере. Только текст результата.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- НОВЫЙ -->
+  <div class="version new">
+    <div class="section-header">
+      <span class="section-tag">— Возможности</span>
+      <h2>Всё что нужно<br>для <em>транскрибации</em></h2>
+    </div>
+    <div class="features-grid">
+
+      <div class="feature-card">
+        <div class="feature-num">01</div>
+        <div class="wave-icon">
+          <span style="height:8px"></span><span style="height:18px"></span><span style="height:12px"></span><span style="height:26px"></span><span style="height:14px"></span><span style="height:20px"></span><span style="height:8px"></span>
+        </div>
+        <h3>Молниеносно</h3>
+        <p>1 минута аудио обрабатывается за ~10 секунд. Не нужно ждать.</p>
+        <span class="feature-tag">~10 сек / мин</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-num">02</div>
+        <div class="wave-icon">
+          <span style="height:20px"></span><span style="height:26px"></span><span style="height:22px"></span><span style="height:28px"></span><span style="height:24px"></span><span style="height:26px"></span><span style="height:20px"></span>
+        </div>
+        <h3>Высокая точность</h3>
+        <p>Распознаёт технические термины, имена и акценты с высокой точностью.</p>
+        <span class="feature-tag">99% accuracy</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-num">03</div>
+        <div class="wave-icon">
+          <span style="height:14px"></span><span style="height:8px"></span><span style="height:20px"></span><span style="height:8px"></span><span style="height:18px"></span><span style="height:10px"></span><span style="height:16px"></span>
+        </div>
+        <h3>Разделение спикеров</h3>
+        <p>Автоматически определяет кто говорит — идеально для интервью и совещаний.</p>
+        <span class="feature-tag">до 10 спикеров</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-num">04</div>
+        <div class="wave-icon">
+          <span style="height:10px"></span><span style="height:24px"></span><span style="height:16px"></span><span style="height:28px"></span><span style="height:18px"></span><span style="height:22px"></span><span style="height:12px"></span>
+        </div>
+        <h3>Экспорт</h3>
+        <p>Скачивай результат в TXT, Word, PDF или Excel одним кликом.</p>
+        <span class="feature-tag">TXT · DOCX · PDF · XLSX</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-num">05</div>
+        <div class="wave-icon">
+          <span style="height:18px"></span><span style="height:12px"></span><span style="height:24px"></span><span style="height:16px"></span><span style="height:26px"></span><span style="height:14px"></span><span style="height:20px"></span>
+        </div>
+        <h3>50+ языков</h3>
+        <p>Русский, английский, украинский и другие — определяется автоматически.</p>
+        <span class="feature-tag">авто-определение</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-num">06</div>
+        <div class="wave-icon">
+          <span style="height:6px"></span><span style="height:10px"></span><span style="height:6px"></span><span style="height:10px"></span><span style="height:6px"></span><span style="height:10px"></span><span style="height:6px"></span>
+        </div>
+        <h3>Безопасно</h3>
+        <p>Аудиофайлы не хранятся на сервере. Только текст результата.</p>
+        <span class="feature-tag">zero storage</span>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function show(id, btn) {
+      document.querySelectorAll('.version').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.switcher button').forEach(b => b.classList.remove('active'));
+      document.querySelector('.' + id).classList.add('active');
+      btn.classList.add('active');
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Logo Preview 3</title>
+  <style>
+    body { background: #080810; display: flex; gap: 50px; align-items: center; justify-content: center; min-height: 100vh; font-family: sans-serif; flex-wrap: wrap; padding: 40px; }
+    .card { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+    .label { color: #7878a0; font-size: 13px; text-align: center; max-width: 140px; line-height: 1.4; }
+    .row { display: flex; gap: 16px; }
+    .box { background: #111120; border: 1px solid #252540; border-radius: 20px; padding: 32px; display: flex; align-items: center; justify-content: center; }
+    .box-dark { background: #080810; border-color: #1a1a2e; }
+  </style>
+</head>
+<body>
+
+<!-- 9: Буква V + микрофон вписан -->
+<div class="card">
+  <div class="row">
+    <div class="box">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <defs>
+          <linearGradient id="g9" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C6FFF"/>
+            <stop offset="100%" stop-color="#FF6584"/>
+          </linearGradient>
+        </defs>
+        <rect width="80" height="80" rx="22" fill="url(#g9)"/>
+        <!-- V shape thick -->
+        <path d="M14 18 L40 62 L66 18" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <!-- Small mic dot at V bottom -->
+        <circle cx="40" cy="62" r="5" fill="white"/>
+        <!-- Sound arcs at top right -->
+        <path d="M60 10 Q68 18 60 26" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.5"/>
+        <path d="M64 6 Q76 18 64 30" stroke="white" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.3"/>
+      </svg>
+    </div>
+    <div class="box box-dark">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <defs>
+          <linearGradient id="g9b" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C6FFF"/>
+            <stop offset="100%" stop-color="#FF6584"/>
+          </linearGradient>
+        </defs>
+        <path d="M14 18 L40 62 L66 18" stroke="url(#g9b)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="40" cy="62" r="5" fill="#FF6584"/>
+        <path d="M60 10 Q68 18 60 26" stroke="#7C6FFF" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+        <path d="M64 6 Q76 18 64 30" stroke="#7C6FFF" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.35"/>
+      </svg>
+    </div>
+  </div>
+  <div class="label">9 — Жирная V + сигнал</div>
+</div>
+
+<!-- 10: Волна превращается в текст -->
+<div class="card">
+  <div class="row">
+    <div class="box">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <defs>
+          <linearGradient id="g10" x1="0" y1="0" x2="80" y2="0" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C6FFF"/>
+            <stop offset="60%" stop-color="#a855f7"/>
+            <stop offset="100%" stop-color="#FF6584"/>
+          </linearGradient>
+        </defs>
+        <rect width="80" height="80" rx="22" fill="#0e0e1e"/>
+        <!-- Wave left morphing into lines right -->
+        <!-- Bar 1 - wave -->
+        <line x1="10" y1="26" x2="10" y2="54" stroke="url(#g10)" stroke-width="4" stroke-linecap="round"/>
+        <!-- Bar 2 -->
+        <line x1="19" y1="18" x2="19" y2="62" stroke="url(#g10)" stroke-width="4" stroke-linecap="round"/>
+        <!-- Bar 3 -->
+        <line x1="28" y1="22" x2="28" y2="58" stroke="url(#g10)" stroke-width="4" stroke-linecap="round"/>
+        <!-- Transition bar -->
+        <line x1="37" y1="30" x2="37" y2="50" stroke="url(#g10)" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- Text lines right (flat) -->
+        <line x1="46" y1="32" x2="70" y2="32" stroke="url(#g10)" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="46" y1="40" x2="70" y2="40" stroke="url(#g10)" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="46" y1="48" x2="64" y2="48" stroke="url(#g10)" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- Divider -->
+        <line x1="41" y1="22" x2="41" y2="58" stroke="white" stroke-width="1" opacity="0.1"/>
+      </svg>
+    </div>
+    <div class="box box-dark">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <defs>
+          <linearGradient id="g10b" x1="0" y1="0" x2="80" y2="0" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C6FFF"/>
+            <stop offset="100%" stop-color="#FF6584"/>
+          </linearGradient>
+        </defs>
+        <line x1="10" y1="26" x2="10" y2="54" stroke="url(#g10b)" stroke-width="4" stroke-linecap="round"/>
+        <line x1="19" y1="18" x2="19" y2="62" stroke="url(#g10b)" stroke-width="4" stroke-linecap="round"/>
+        <line x1="28" y1="22" x2="28" y2="58" stroke="url(#g10b)" stroke-width="4" stroke-linecap="round"/>
+        <line x1="37" y1="30" x2="37" y2="50" stroke="url(#g10b)" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="46" y1="32" x2="70" y2="32" stroke="url(#g10b)" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="46" y1="40" x2="70" y2="40" stroke="url(#g10b)" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="46" y1="48" x2="64" y2="48" stroke="url(#g10b)" stroke-width="3.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+  <div class="label">10 — Волна → Текст</div>
+</div>
+
+<!-- 11: Микрофон в кружке минимализм -->
+<div class="card">
+  <div class="row">
+    <div class="box">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <defs>
+          <linearGradient id="g11" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C6FFF"/>
+            <stop offset="100%" stop-color="#FF6584"/>
+          </linearGradient>
+          <linearGradient id="g11r" x1="0" y1="80" x2="80" y2="0" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#FF6584" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#7C6FFF" stop-opacity="0.1"/>
+          </linearGradient>
+        </defs>
+        <!-- Background -->
+        <circle cx="40" cy="40" r="40" fill="url(#g11)"/>
+        <!-- Glow inner -->
+        <circle cx="40" cy="40" r="28" fill="url(#g11r)"/>
+        <!-- Mic -->
+        <rect x="31" y="16" width="18" height="28" rx="9" fill="white"/>
+        <!-- Mic hole detail -->
+        <rect x="36" y="22" width="8" height="3" rx="1.5" fill="#7C6FFF" opacity="0.3"/>
+        <rect x="36" y="28" width="8" height="3" rx="1.5" fill="#7C6FFF" opacity="0.3"/>
+        <!-- Arc -->
+        <path d="M22 40 Q22 58 40 58 Q58 58 58 40" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <!-- Stand -->
+        <line x1="40" y1="58" x2="40" y2="66" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="30" y1="66" x2="50" y2="66" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="box box-dark">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <defs>
+          <linearGradient id="g11b" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C6FFF"/>
+            <stop offset="100%" stop-color="#FF6584"/>
+          </linearGradient>
+        </defs>
+        <circle cx="40" cy="40" r="38" fill="none" stroke="url(#g11b)" stroke-width="2"/>
+        <rect x="31" y="16" width="18" height="28" rx="9" fill="url(#g11b)"/>
+        <path d="M22 40 Q22 58 40 58 Q58 58 58 40" stroke="url(#g11b)" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <line x1="40" y1="58" x2="40" y2="66" stroke="#7C6FFF" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="30" y1="66" x2="50" y2="66" stroke="#7C6FFF" stroke-width="3.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+  <div class="label">11 — Круг + Микрофон</div>
+</div>
+
+<!-- 12: Две волны зеркально (как ДНК голоса) -->
+<div class="card">
+  <div class="row">
+    <div class="box">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <defs>
+          <linearGradient id="g12" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C6FFF"/>
+            <stop offset="100%" stop-color="#FF6584"/>
+          </linearGradient>
+        </defs>
+        <rect width="80" height="80" rx="22" fill="url(#g12)"/>
+        <!-- Top wave -->
+        <path d="M8 30 Q16 16 24 30 Q32 44 40 30 Q48 16 56 30 Q64 44 72 30" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <!-- Bottom wave (mirror) -->
+        <path d="M8 50 Q16 64 24 50 Q32 36 40 50 Q48 64 56 50 Q64 36 72 50" stroke="white" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.5"/>
+        <!-- Center line -->
+        <line x1="8" y1="40" x2="72" y2="40" stroke="white" stroke-width="1.5" opacity="0.2"/>
+      </svg>
+    </div>
+    <div class="box box-dark">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <defs>
+          <linearGradient id="g12b" x1="0" y1="0" x2="80" y2="0" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C6FFF"/>
+            <stop offset="100%" stop-color="#FF6584"/>
+          </linearGradient>
+        </defs>
+        <path d="M8 30 Q16 16 24 30 Q32 44 40 30 Q48 16 56 30 Q64 44 72 30" stroke="url(#g12b)" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path d="M8 50 Q16 64 24 50 Q32 36 40 50 Q48 64 56 50 Q64 36 72 50" stroke="url(#g12b)" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.4"/>
+      </svg>
+    </div>
+  </div>
+  <div class="label">12 — Двойная волна</div>
+</div>
+
+<!-- 13: Текстовый курсор + волна -->
+<div class="card">
+  <div class="row">
+    <div class="box">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <defs>
+          <linearGradient id="g13" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C6FFF"/>
+            <stop offset="100%" stop-color="#FF6584"/>
+          </linearGradient>
+        </defs>
+        <rect width="80" height="80" rx="22" fill="#0e0e1e"/>
+        <!-- Sound wave -->
+        <line x1="8"  y1="34" x2="8"  y2="46" stroke="url(#g13)" stroke-width="3.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="16" y1="26" x2="16" y2="54" stroke="url(#g13)" stroke-width="3.5" stroke-linecap="round" opacity="0.65"/>
+        <line x1="24" y1="20" x2="24" y2="60" stroke="url(#g13)" stroke-width="3.5" stroke-linecap="round" opacity="0.85"/>
+        <line x1="32" y1="28" x2="32" y2="52" stroke="url(#g13)" stroke-width="3.5" stroke-linecap="round" opacity="0.7"/>
+        <line x1="40" y1="34" x2="40" y2="46" stroke="url(#g13)" stroke-width="3.5" stroke-linecap="round" opacity="0.5"/>
+        <!-- Cursor blinking bar -->
+        <rect x="50" y="22" width="5" height="36" rx="2.5" fill="url(#g13)"/>
+        <!-- Cursor serifs -->
+        <line x1="44" y1="22" x2="61" y2="22" stroke="url(#g13)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="44" y1="58" x2="61" y2="58" stroke="url(#g13)" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="box box-dark">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <defs>
+          <linearGradient id="g13b" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C6FFF"/>
+            <stop offset="100%" stop-color="#FF6584"/>
+          </linearGradient>
+        </defs>
+        <line x1="8"  y1="34" x2="8"  y2="46" stroke="#7C6FFF" stroke-width="3.5" stroke-linecap="round" opacity="0.35"/>
+        <line x1="16" y1="26" x2="16" y2="54" stroke="#7C6FFF" stroke-width="3.5" stroke-linecap="round" opacity="0.55"/>
+        <line x1="24" y1="20" x2="24" y2="60" stroke="#7C6FFF" stroke-width="3.5" stroke-linecap="round" opacity="0.8"/>
+        <line x1="32" y1="28" x2="32" y2="52" stroke="#7C6FFF" stroke-width="3.5" stroke-linecap="round" opacity="0.6"/>
+        <line x1="40" y1="34" x2="40" y2="46" stroke="#7C6FFF" stroke-width="3.5" stroke-linecap="round" opacity="0.4"/>
+        <rect x="50" y="22" width="5" height="36" rx="2.5" fill="url(#g13b)"/>
+        <line x1="44" y1="22" x2="61" y2="22" stroke="url(#g13b)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="44" y1="58" x2="61" y2="58" stroke="url(#g13b)" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+  <div class="label">13 — Волна + Курсор</div>
+</div>
+
+</body>
+</html>
