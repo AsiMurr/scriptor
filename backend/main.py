@@ -711,18 +711,23 @@ def admin_get_users(token: str = "", db: Session = Depends(get_db)):
     return result
 
 
+class AdminUserUpdate(BaseModel):
+    plan: Optional[str] = None
+    is_active: Optional[bool] = None
+    balance: Optional[float] = None
+
 @app.patch("/api/admin/users/{user_id}")
-def admin_update_user(user_id: int, data: dict, token: str = "", db: Session = Depends(get_db)):
+def admin_update_user(user_id: int, data: AdminUserUpdate, token: str = "", db: Session = Depends(get_db)):
     _check_admin(token)
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    if "plan" in data:
-        user.plan = data["plan"]
-    if "is_active" in data:
-        user.is_active = data["is_active"]
-    if "balance" in data:
-        user.balance = data["balance"]
+    if data.plan is not None:
+        user.plan = data.plan
+    if data.is_active is not None:
+        user.is_active = data.is_active
+    if data.balance is not None:
+        user.balance = data.balance
     db.commit()
     return {"ok": True}
 
