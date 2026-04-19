@@ -694,7 +694,6 @@ def _check_admin(token: str):
 def admin_get_users(token: str = "", db: Session = Depends(get_db)):
     _check_admin(token)
     users = db.query(User).order_by(User.created_at.desc()).all()
-    now = datetime.utcnow()
     result = []
     for u in users:
         used = get_used_minutes_this_month(u.id, db)
