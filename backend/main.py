@@ -685,6 +685,74 @@ def get_error_logs(token: str = "", db: Session = Depends(get_db)):
     ]
 
 
+def _check_admin(token: str):
+    if token != os.getenv("ADMIN_TOKEN", ""):
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+
+@app.get("/api/admin/users")
+def admin_get_users(token: str = "", db: Session = Depends(get_db)):
+    _check_admin(token)
+    users = db.query(User).order_by(User.created_at.desc()).all()
+    now = datetime.utcnow()
+    result = []
+    for u in users:
+        used = get_used_minutes_this_month(u.id, db)
+        result.append({
+            "id": u.id,
+            "email": u.email,
+            "plan": u.plan,
+            "is_active": u.is_active,
+            "is_verified": u.is_verified,
+            "created_at": u.created_at.isoformat() if u.created_at else None,
+            "used_minutes": round(used, 1),
+            "balance": u.balance,
+        })
+    return result
+
+
+@app.patch("/api/admin/users/{user_id}")
+def admin_update_user(user_id: int, data: dict, token: str = "", db: Session = Depends(get_db)):
+    _check_admin(token)
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if "plan" in data:
+        user.plan = data["plan"]
+    if "is_active" in data:
+        user.is_active = data["is_active"]
+    if "balance" in data:
+        user.balance = data["balance"]
+    db.commit()
+    return {"ok": True}
+
+
+@app.delete("/api/admin/users/{user_id}")
+def admin_delete_user(user_id: int, token: str = "", db: Session = Depends(get_db)):
+    _check_admin(token)
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.delete(user)
+    db.commit()
+    return {"ok": True}
+
+
+@app.get("/api/admin/stats")
+def admin_stats(token: str = "", db: Session = Depends(get_db)):
+    _check_admin(token)
+    total = db.query(User).count()
+    active = db.query(User).filter(User.is_active == True, User.plan != "free").count()
+    free = db.query(User).filter(User.plan == "free").count()
+    paid = db.query(User).filter(User.plan.in_(["standard", "pro"])).count()
+    return {
+        "total": total,
+        "active": active,
+        "free": free,
+        "paid": paid,
+    }
+
+
 # ─── Email verify & password reset ──────────────────────────────────────────
 
 def send_verify_email(email: str, token: str):
@@ -852,6 +920,10 @@ if frontend_path.exists():
     @app.get("/app", include_in_schema=False)
     def app_page():
         return FileResponse(str(frontend_path / "app.html"))
+
+    @app.get("/admin", include_in_schema=False)
+    def admin_page():
+        return FileResponse(str(frontend_path / "admin.html"))
 
 
 # ─── Startup ─────────────────────────────────────────────────────────────────
