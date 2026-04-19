@@ -355,13 +355,16 @@
 </div>
 
 <script>
-  let TOKEN = '';
+  let TOKEN = localStorage.getItem('admin_token') || '';
   let allUsers = [];
+
+  if (TOKEN) loadData();
 
   function login() {
     const t = document.getElementById('token-input').value.trim();
     if (!t) return;
     TOKEN = t;
+    localStorage.setItem('admin_token', t);
     loadData();
   }
 
@@ -371,6 +374,7 @@
 
   function logout() {
     TOKEN = '';
+    localStorage.removeItem('admin_token');
     document.getElementById('admin-panel').style.display = 'none';
     document.getElementById('login-screen').style.display = 'flex';
   }
