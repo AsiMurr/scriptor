@@ -11,3 +11,6 @@ aiofiles==23.2.1
 httpx==0.27.0
 assemblyai
 requests
+python-docx
+fpdf2
+openpyxl
