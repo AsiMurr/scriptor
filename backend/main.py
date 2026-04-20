@@ -533,13 +533,14 @@ def download_history_item(
             from pathlib import Path
             font_path = Path(__file__).parent / "fonts" / "DejaVuSans.ttf"
             pdf = FPDF()
-            pdf.set_margins(15, 15, 15)
-            pdf.set_auto_page_break(auto=True, margin=15)
+            pdf.set_margins(20, 20, 20)
+            pdf.set_auto_page_break(auto=True, margin=20)
             pdf.add_page()
             pdf.add_font("DejaVu", fname=str(font_path))
             pdf.set_font("DejaVu", size=11)
+            cell_w = pdf.w - pdf.l_margin - pdf.r_margin
             for line in row.text.split("\n"):
-                pdf.multi_cell(0, 7, line or " ")
+                pdf.multi_cell(cell_w, 7, line or " ")
             out = pdf.output()
             buf = io.BytesIO(out if isinstance(out, bytes) else bytes(out))
             return StreamingResponse(buf, media_type="application/pdf",
@@ -593,11 +594,14 @@ def download_text_body(body: DownloadRequest, user: User = Depends(get_current_u
             from pathlib import Path
             font_path = Path(__file__).parent / "fonts" / "DejaVuSans.ttf"
             pdf = FPDF()
+            pdf.set_margins(20, 20, 20)
+            pdf.set_auto_page_break(auto=True, margin=20)
             pdf.add_page()
             pdf.add_font("DejaVu", fname=str(font_path))
-            pdf.set_font("DejaVu", size=12)
+            pdf.set_font("DejaVu", size=11)
+            cell_w = pdf.w - pdf.l_margin - pdf.r_margin
             for line in text.split("\n"):
-                pdf.multi_cell(0, 8, line)
+                pdf.multi_cell(cell_w, 7, line or " ")
             out = pdf.output()
             buf = io.BytesIO(out if isinstance(out, bytes) else bytes(out))
             return StreamingResponse(buf, media_type="application/pdf",
