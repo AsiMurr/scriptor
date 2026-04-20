@@ -580,14 +580,17 @@ def download_text_body(body: DownloadRequest, user: User = Depends(get_current_u
                                  headers={"Content-Disposition": f'attachment; filename="{base_name}.docx"'})
 
     elif fmt == "pdf":
+        import fpdf as fpdf_module
+        import os as _os
         from fpdf import FPDF
+        font_path = _os.path.join(_os.path.dirname(fpdf_module.__file__), "fonts", "DejaVuSans.ttf")
         pdf = FPDF()
         pdf.add_page()
-        pdf.set_font("Helvetica", size=12)
+        pdf.add_font("DejaVu", fname=font_path)
+        pdf.set_font("DejaVu", size=12)
         for line in text.split("\n"):
-            safe = line.encode("latin-1", "replace").decode("latin-1")
-            pdf.multi_cell(0, 8, safe)
-        buf = io.BytesIO(pdf.output())
+            pdf.multi_cell(0, 8, line)
+        buf = io.BytesIO(bytes(pdf.output()))
         return StreamingResponse(buf, media_type="application/pdf",
                                  headers={"Content-Disposition": f'attachment; filename="{base_name}.pdf"'})
 
