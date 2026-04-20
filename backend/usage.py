@@ -6,9 +6,16 @@ from database import Transcription, User
 # Лимиты по тарифам (в минутах)
 PLAN_LIMITS = {
     "guest": 10,
-    "free": 20,
-    "standard": 300,   # 5 часов
-    "pro": float("inf"),
+    "free": 30,        # 30 минут
+    "standard": 600,   # 10 часов
+    "pro": 1800,       # 30 часов
+}
+
+PLAN_NAMES = {
+    "guest": "Гостевой",
+    "free": "Бесплатный",
+    "standard": "Стандарт",
+    "pro": "Про",
 }
 
 
@@ -24,8 +31,6 @@ def get_used_minutes_this_month(user_id: int, db: Session) -> float:
 
 def get_remaining_minutes(user: User, db: Session) -> float:
     limit = PLAN_LIMITS[user.plan]
-    if limit == float("inf"):
-        return float("inf")
     used = get_used_minutes_this_month(user.id, db)
     return max(0.0, limit - used)
 

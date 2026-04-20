@@ -316,7 +316,7 @@ a:hover { text-decoration: underline; }
 .plan-card .plan-features { flex: 1; }
 .plan-popular { background: #0a0a18; }
 .plan-popular::before {
-  content: 'Популярный'; position: absolute; top: 0; left: 0; right: 0;
+  content: 'Выгоднее конкурентов'; position: absolute; top: 0; left: 0; right: 0;
   background: linear-gradient(90deg, #7C6FFF, #FF6584);
   color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
   text-transform: uppercase; text-align: center; padding: 6px; height: 28px;

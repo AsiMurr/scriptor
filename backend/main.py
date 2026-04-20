@@ -292,8 +292,8 @@ def me(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
         email=user.email,
         plan=user.plan,
         used_minutes=round(used, 2),
-        limit_minutes=limit if limit != float("inf") else "∞",
-        remaining_minutes=round(remaining, 2) if remaining != float("inf") else "∞",
+        limit_minutes=limit,
+        remaining_minutes=round(remaining, 2),
         balance=round(user.balance or 0.0, 2),
     )
 
@@ -422,7 +422,7 @@ async def transcribe(
         "text": text,
         "duration_seconds": round(duration_sec, 1),
         "used_minutes": round(used, 2),
-        "remaining_minutes": round(remaining, 2) if remaining != float("inf") else "∞",
+        "remaining_minutes": round(remaining, 2),
     }
 
 
