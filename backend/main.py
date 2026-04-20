@@ -530,9 +530,8 @@ def download_history_item(
     elif fmt == "pdf":
         try:
             from fpdf import FPDF
-            import fpdf as _fpdf
             from pathlib import Path
-            font_path = Path(_fpdf.__file__).parent / "fonts" / "DejaVuSans.ttf"
+            font_path = Path(__file__).parent / "fonts" / "DejaVuSans.ttf"
             pdf = FPDF()
             pdf.add_page()
             pdf.add_font("DejaVu", fname=str(font_path))
@@ -589,9 +588,8 @@ def download_text_body(body: DownloadRequest, user: User = Depends(get_current_u
     elif fmt == "pdf":
         try:
             from fpdf import FPDF
-            import fpdf as _fpdf
             from pathlib import Path
-            font_path = Path(_fpdf.__file__).parent / "fonts" / "DejaVuSans.ttf"
+            font_path = Path(__file__).parent / "fonts" / "DejaVuSans.ttf"
             pdf = FPDF()
             pdf.add_page()
             pdf.add_font("DejaVu", fname=str(font_path))
