@@ -14,3 +14,4 @@ requests
 python-docx
 fpdf2
 openpyxl
+psycopg2-binary
