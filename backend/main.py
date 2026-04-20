@@ -528,17 +528,23 @@ def download_history_item(
                                   headers={"Content-Disposition": f'attachment; filename="{base_name}.docx"'})
 
     elif fmt == "pdf":
-        from fpdf import FPDF
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Helvetica", size=12)
-        pdf.set_title(row.filename)
-        for line in row.text.split("\n"):
-            safe = line.encode("latin-1", "replace").decode("latin-1")
-            pdf.multi_cell(0, 8, safe)
-        buf = io.BytesIO(pdf.output())
-        return StreamingResponse(buf, media_type="application/pdf",
-                                  headers={"Content-Disposition": f'attachment; filename="{base_name}.pdf"'})
+        try:
+            from fpdf import FPDF
+            import fpdf as _fpdf
+            from pathlib import Path
+            font_path = Path(_fpdf.__file__).parent / "fonts" / "DejaVuSans.ttf"
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.add_font("DejaVu", fname=str(font_path))
+            pdf.set_font("DejaVu", size=12)
+            for line in row.text.split("\n"):
+                pdf.multi_cell(0, 8, line)
+            out = pdf.output()
+            buf = io.BytesIO(out if isinstance(out, bytes) else bytes(out))
+            return StreamingResponse(buf, media_type="application/pdf",
+                                      headers={"Content-Disposition": f'attachment; filename="{base_name}.pdf"'})
+        except Exception as pdf_err:
+            raise HTTPException(status_code=500, detail=f"PDF error: {pdf_err}")
 
     elif fmt == "xlsx":
         from openpyxl import Workbook
@@ -581,19 +587,23 @@ def download_text_body(body: DownloadRequest, user: User = Depends(get_current_u
                                  headers={"Content-Disposition": f'attachment; filename="{base_name}.docx"'})
 
     elif fmt == "pdf":
-        import fpdf as fpdf_module
-        import os as _os
-        from fpdf import FPDF
-        font_path = _os.path.join(_os.path.dirname(fpdf_module.__file__), "fonts", "DejaVuSans.ttf")
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.add_font("DejaVu", fname=font_path)
-        pdf.set_font("DejaVu", size=12)
-        for line in text.split("\n"):
-            pdf.multi_cell(0, 8, line)
-        buf = io.BytesIO(bytes(pdf.output()))
-        return StreamingResponse(buf, media_type="application/pdf",
-                                 headers={"Content-Disposition": f'attachment; filename="{base_name}.pdf"'})
+        try:
+            from fpdf import FPDF
+            import fpdf as _fpdf
+            from pathlib import Path
+            font_path = Path(_fpdf.__file__).parent / "fonts" / "DejaVuSans.ttf"
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.add_font("DejaVu", fname=str(font_path))
+            pdf.set_font("DejaVu", size=12)
+            for line in text.split("\n"):
+                pdf.multi_cell(0, 8, line)
+            out = pdf.output()
+            buf = io.BytesIO(out if isinstance(out, bytes) else bytes(out))
+            return StreamingResponse(buf, media_type="application/pdf",
+                                     headers={"Content-Disposition": f'attachment; filename="{base_name}.pdf"'})
+        except Exception as pdf_err:
+            raise HTTPException(status_code=500, detail=f"PDF error: {pdf_err}")
 
     elif fmt == "xlsx":
         from openpyxl import Workbook
