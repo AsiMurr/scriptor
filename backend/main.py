@@ -275,8 +275,9 @@ def login(req: LoginRequest, request: Request, db: Session = Depends(get_db)):
 
 
 @app.post("/api/auth/guest", response_model=TokenResponse)
-def guest_login():
-    return TokenResponse(access_token=create_guest_token())
+def guest_login(request: Request):
+    ip = request.headers.get("X-Forwarded-For", request.client.host).split(",")[0].strip()
+    return TokenResponse(access_token=create_guest_token(ip))
 
 
 # ─── User info ───────────────────────────────────────────────────────────────

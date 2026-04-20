@@ -28,9 +28,9 @@ def create_access_token(user_id: int, email: str) -> str:
     return jwt.encode({"sub": str(user_id), "email": email, "exp": expire}, SECRET_KEY, algorithm=ALGORITHM)
 
 
-def create_guest_token() -> str:
-    import uuid
-    guest_id = abs(hash(uuid.uuid4().hex)) % 10**9 + 10**9  # уникальный int, не пересекается с реальными user_id
+def create_guest_token(ip: str = "unknown") -> str:
+    import hashlib
+    guest_id = int(hashlib.md5(ip.encode()).hexdigest(), 16) % 10**9 + 10**9
     expire = datetime.utcnow() + timedelta(hours=24)
     return jwt.encode({"sub": f"guest_{guest_id}", "email": "guest", "plan": "guest", "exp": expire}, SECRET_KEY, algorithm=ALGORITHM)
 
