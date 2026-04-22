@@ -451,12 +451,10 @@
       if (m !== btn.nextElementSibling) m.classList.remove('open');
     });
     const menu = btn.nextElementSibling;
+    menu.classList.remove('drop-up');
+    const btnRect = btn.getBoundingClientRect();
+    if (btnRect.bottom > window.innerHeight - 120) menu.classList.add('drop-up');
     menu.classList.toggle('open');
-    if (menu.classList.contains('open')) {
-      menu.classList.remove('drop-up');
-      const rect = menu.getBoundingClientRect();
-      if (rect.bottom > window.innerHeight) menu.classList.add('drop-up');
-    }
   }
   document.addEventListener('click', e => {
     if (!e.target.closest('.dropdown')) {
