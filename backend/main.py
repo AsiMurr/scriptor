@@ -868,9 +868,13 @@ def reset_password(body: dict, db: Session = Depends(get_db)):
     from datetime import datetime
     token = body.get("token", "")
     new_password = body.get("password", "")
+    print(f"[RESET] token received: '{token[:20] if token else 'EMPTY'}...' len={len(token)}", flush=True)
     if len(new_password) < 6:
         raise HTTPException(status_code=400, detail="Пароль минимум 6 символов")
     user = db.query(User).filter(User.reset_token == token).first()
+    print(f"[RESET] user found: {user.email if user else 'NONE'}", flush=True)
+    if user:
+        print(f"[RESET] expires: {user.reset_token_expires}, now: {datetime.utcnow()}", flush=True)
     if not user or not user.reset_token_expires or user.reset_token_expires < datetime.utcnow():
         raise HTTPException(status_code=400, detail="Ссылка недействительна или истекла")
     user.hashed_password = hash_password(new_password)
