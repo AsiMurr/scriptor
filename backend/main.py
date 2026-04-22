@@ -126,111 +126,65 @@ def check_register_rate(ip: str):
     _register_attempts[ip].append(now)
 
 
-def send_welcome_email(email: str, password: str):
-    smtp_host = os.getenv("SMTP_HOST", "")
-    smtp_port = int(os.getenv("SMTP_PORT", "587"))
-    smtp_user = os.getenv("SMTP_USER", "")
-    smtp_pass = os.getenv("SMTP_PASS", "")
-    if not smtp_host or not smtp_user:
-        return
+def _send_resend(to: str, subject: str, html: str) -> bool:
+    api_key = os.getenv("RESEND_API_KEY", "")
+    from_addr = os.getenv("RESEND_FROM", "Scriptor <onboarding@resend.dev>")
+    if not api_key:
+        print("[EMAIL] RESEND_API_KEY not set", flush=True)
+        return False
     try:
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = "Добро пожаловать в Scriptor 🎙"
-        msg["From"] = smtp_user
-        msg["To"] = email
-        html = f"""<!DOCTYPE html>
+        resp = req_lib.post(
+            "https://api.resend.com/emails",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={"from": from_addr, "to": [to], "subject": subject, "html": html},
+            timeout=15,
+        )
+        if resp.status_code >= 300:
+            print(f"[EMAIL ERROR] Resend {resp.status_code}: {resp.text}", flush=True)
+            return False
+        return True
+    except Exception as e:
+        print(f"[EMAIL ERROR] Resend exception: {e}", flush=True)
+        return False
+
+
+def send_welcome_email(email: str, password: str):
+    base_url = os.getenv("BASE_URL", "https://getscriptor.ru")
+    html = f"""<!DOCTYPE html>
 <html>
 <body style="margin:0;padding:60px 0;background:#080810;font-family:'Segoe UI',Arial,sans-serif">
 <div style="max-width:520px;margin:0 auto;background:#0e0e1a;border-radius:16px;overflow:hidden;border:1px solid #1e1e30">
-
-  <!-- Шапка -->
   <div style="background:linear-gradient(135deg,#7C6FFF,#FF6584);padding:32px;text-align:center">
-    <div style="margin-bottom:10px">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="56" height="56" style="display:inline-block">
-        <rect x="10" y="10" width="180" height="180" rx="38" fill="#1a1040" stroke="#00d4ff" stroke-width="3.5"/>
-        <defs><linearGradient id="em" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#b0a0ff"/><stop offset="100%" stop-color="#7C6FFF"/></linearGradient></defs>
-        <rect x="80" y="44" width="40" height="64" rx="4" fill="url(#em)"/>
-        <rect x="80" y="60" width="40" height="3" fill="rgba(255,255,255,0.25)"/>
-        <rect x="80" y="70" width="40" height="3" fill="rgba(255,255,255,0.25)"/>
-        <rect x="80" y="80" width="40" height="3" fill="rgba(255,255,255,0.25)"/>
-        <rect x="80" y="90" width="40" height="3" fill="rgba(255,255,255,0.25)"/>
-        <path d="M 66,110 Q 66,138 100,138 Q 134,138 134,110" fill="none" stroke="#9080ef" stroke-width="5" stroke-linecap="square"/>
-        <rect x="97" y="138" width="6" height="13" fill="#9080ef"/>
-        <rect x="76" y="150" width="48" height="6" rx="1" fill="#9080ef"/>
-      </svg>
-    </div>
     <div style="color:#fff;font-size:24px;font-weight:700;letter-spacing:-0.5px">Scriptor</div>
     <div style="color:rgba(255,255,255,0.8);font-size:14px;margin-top:6px">Голос в текст</div>
   </div>
-
-  <!-- Приветствие -->
   <div style="padding:32px 32px 0">
-    <h2 style="margin:0 0 10px;color:#eeeef8;font-size:22px">Поздравляем с регистрацией! 🎉</h2>
-    <p style="margin:0;color:#9090b0;font-size:15px;line-height:1.6">
-      Ваш аккаунт успешно создан. Теперь вам доступны все возможности сервиса.
-    </p>
+    <h2 style="margin:0 0 10px;color:#eeeef8;font-size:22px">Поздравляем с регистрацией!</h2>
+    <p style="margin:0;color:#9090b0;font-size:15px;line-height:1.6">Ваш аккаунт успешно создан.</p>
   </div>
-
-  <!-- Данные аккаунта -->
   <div style="margin:24px 32px;background:#161625;border:1px solid #252540;border-radius:12px;padding:20px">
     <div style="color:#7878a0;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px">Данные аккаунта</div>
     <div style="margin-bottom:10px">
-      <span style="color:#7878a0;font-size:13px">📧 Email</span><br>
+      <span style="color:#7878a0;font-size:13px">Email</span><br>
       <span style="color:#eeeef8;font-size:15px;font-weight:600">{email}</span>
     </div>
     <div>
-      <span style="color:#7878a0;font-size:13px">🔑 Пароль</span><br>
+      <span style="color:#7878a0;font-size:13px">Пароль</span><br>
       <span style="color:#eeeef8;font-size:15px;font-weight:600">{password}</span>
     </div>
-    <div style="margin-top:14px;padding-top:14px;border-top:1px solid #252540;color:#7878a0;font-size:12px">
-      Сохраните эти данные — они понадобятся для входа.
-    </div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid #252540;color:#7878a0;font-size:12px">Сохраните — они понадобятся для входа.</div>
   </div>
-
-  <!-- Что доступно -->
-  <div style="padding:0 32px">
-    <div style="color:#7878a0;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px">Что доступно с аккаунтом</div>
-    <table width="100%" cellpadding="0" cellspacing="0" border="0">
-      <tr>
-        <td width="22" style="vertical-align:top;padding:4px 0;color:#eeeef8;font-size:14px">✅</td>
-        <td style="vertical-align:top;padding:4px 16px 4px 6px;color:#eeeef8;font-size:14px;line-height:1.4;width:50%"><b>30 минут</b> бесплатно каждый месяц</td>
-        <td width="22" style="vertical-align:top;padding:4px 0;color:#eeeef8;font-size:14px">✅</td>
-        <td style="vertical-align:top;padding:4px 0 4px 6px;color:#eeeef8;font-size:14px;line-height:1.4"><b>История</b> всех транскрипций</td>
-      </tr>
-      <tr><td colspan="4" height="6"></td></tr>
-      <tr>
-        <td width="22" style="vertical-align:top;padding:4px 0;color:#eeeef8;font-size:14px">✅</td>
-        <td style="vertical-align:top;padding:4px 16px 4px 6px;color:#eeeef8;font-size:14px;line-height:1.4">Все форматы: <b>MP3, WAV, MP4</b> и другие</td>
-        <td width="22" style="vertical-align:top;padding:4px 0;color:#eeeef8;font-size:14px">✅</td>
-        <td style="vertical-align:top;padding:4px 0 4px 6px;color:#eeeef8;font-size:14px;line-height:1.4">Экспорт в <b>Word, PDF, Excel, TXT</b></td>
-      </tr>
-    </table>
+  <div style="padding:0 32px 32px;text-align:center">
+    <a href="{base_url}/app" style="display:inline-block;background:linear-gradient(135deg,#7C6FFF,#5a52d5);color:#fff;text-decoration:none;padding:14px 36px;border-radius:10px;font-size:15px;font-weight:600">Открыть приложение →</a>
   </div>
-
-  <!-- Кнопка -->
-  <div style="padding:32px;text-align:center">
-    <a href="http://localhost:8000/app" style="display:inline-block;background:linear-gradient(135deg,#7C6FFF,#5a52d5);color:#fff;text-decoration:none;padding:14px 36px;border-radius:10px;font-size:15px;font-weight:600">
-      Открыть приложение →
-    </a>
-  </div>
-
-  <!-- Подвал -->
   <div style="padding:20px 32px;border-top:1px solid #1e1e30;text-align:center">
-    <p style="margin:0;color:#555570;font-size:12px">
-      Если вы не регистрировались — просто проигнорируйте это письмо.
-    </p>
+    <p style="margin:0;color:#555570;font-size:12px">Если вы не регистрировались — просто проигнорируйте это письмо.</p>
     <p style="margin:8px 0 0;color:#555570;font-size:12px">© Scriptor</p>
   </div>
-
 </div>
 </body>
 </html>"""
-        msg.attach(MIMEText(html, "html"))
-        with smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10) as s:
-            s.login(smtp_user, smtp_pass)
-            s.sendmail(smtp_user, email, msg.as_string())
-    except Exception as e:
-        print(f"[EMAIL ERROR send_welcome_email to {email}]: {e}", flush=True)
+    _send_resend(email, "Добро пожаловать в Scriptor", html)
 
 
 @app.post("/api/auth/register", response_model=TokenResponse)
@@ -756,24 +710,22 @@ def admin_delete_user(user_id: int, token: str = "", db: Session = Depends(get_d
 @app.get("/api/admin/test-email")
 def admin_test_email(to: str, token: str = "", db: Session = Depends(get_db)):
     _check_admin(token)
-    smtp_host = os.getenv("SMTP_HOST", "")
-    smtp_user = os.getenv("SMTP_USER", "")
-    smtp_pass = os.getenv("SMTP_PASS", "")
-    smtp_port = int(os.getenv("SMTP_PORT", "465"))
-    if not smtp_host or not smtp_user:
-        return {"ok": False, "error": "SMTP not configured", "host": smtp_host, "user": smtp_user}
+    api_key = os.getenv("RESEND_API_KEY", "")
+    from_addr = os.getenv("RESEND_FROM", "Scriptor <onboarding@resend.dev>")
+    if not api_key:
+        return {"ok": False, "error": "RESEND_API_KEY not set"}
     try:
-        from email.mime.text import MIMEText
-        msg = MIMEText("Тестовое письмо от Scriptor", "plain", "utf-8")
-        msg["Subject"] = "Тест SMTP — Scriptor"
-        msg["From"] = smtp_user
-        msg["To"] = to
-        with smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10) as s:
-            s.login(smtp_user, smtp_pass)
-            s.sendmail(smtp_user, to, msg.as_string())
-        return {"ok": True, "from": smtp_user, "to": to, "host": smtp_host, "port": smtp_port}
+        resp = req_lib.post(
+            "https://api.resend.com/emails",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={"from": from_addr, "to": [to], "subject": "Тест Resend — Scriptor", "html": "<p>Тестовое письмо от Scriptor через Resend.</p>"},
+            timeout=15,
+        )
+        if resp.status_code >= 300:
+            return {"ok": False, "status": resp.status_code, "body": resp.text}
+        return {"ok": True, "from": from_addr, "to": to, "resend_response": resp.json()}
     except Exception as e:
-        return {"ok": False, "error": str(e), "host": smtp_host, "user": smtp_user, "port": smtp_port}
+        return {"ok": False, "error": str(e)}
 
 
 @app.post("/api/admin/set-password")
@@ -813,20 +765,9 @@ def admin_stats(token: str = "", db: Session = Depends(get_db)):
 # ─── Email verify & password reset ──────────────────────────────────────────
 
 def send_verify_email(email: str, token: str):
-    smtp_host = os.getenv("SMTP_HOST", "")
-    smtp_user = os.getenv("SMTP_USER", "")
-    smtp_pass = os.getenv("SMTP_PASS", "")
-    smtp_port = int(os.getenv("SMTP_PORT", "587"))
-    if not smtp_host or not smtp_user:
-        return
-    base_url = os.getenv("BASE_URL", "http://localhost:8000")
+    base_url = os.getenv("BASE_URL", "https://getscriptor.ru")
     link = f"{base_url}/api/auth/verify/{token}"
-    try:
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = "Подтвердите email — Scriptor"
-        msg["From"] = smtp_user
-        msg["To"] = email
-        html = f"""<!DOCTYPE html>
+    html = f"""<!DOCTYPE html>
 <html><body style="margin:0;padding:40px 0;background:#080810;font-family:'Segoe UI',Arial,sans-serif">
 <div style="max-width:480px;margin:0 auto;background:#0e0e1a;border-radius:16px;overflow:hidden;border:1px solid #1e1e30">
   <div style="background:linear-gradient(135deg,#7C6FFF,#FF6584);padding:28px;text-align:center">
@@ -835,43 +776,21 @@ def send_verify_email(email: str, token: str):
   </div>
   <div style="padding:32px">
     <h2 style="margin:0 0 12px;color:#eeeef8;font-size:20px">Подтвердите ваш email</h2>
-    <p style="color:#9090b0;font-size:14px;line-height:1.6;margin:0 0 24px">
-      Нажмите кнопку ниже чтобы активировать аккаунт. Ссылка действует 24 часа.
-    </p>
+    <p style="color:#9090b0;font-size:14px;line-height:1.6;margin:0 0 24px">Нажмите кнопку ниже чтобы активировать аккаунт. Ссылка действует 24 часа.</p>
     <div style="text-align:center">
-      <a href="{link}" style="display:inline-block;background:linear-gradient(135deg,#7C6FFF,#5a52d5);color:#fff;text-decoration:none;padding:14px 36px;border-radius:10px;font-size:15px;font-weight:600">
-        Подтвердить email →
-      </a>
+      <a href="{link}" style="display:inline-block;background:linear-gradient(135deg,#7C6FFF,#5a52d5);color:#fff;text-decoration:none;padding:14px 36px;border-radius:10px;font-size:15px;font-weight:600">Подтвердить email →</a>
     </div>
-    <p style="margin:24px 0 0;color:#555570;font-size:12px;text-align:center">
-      Если вы не регистрировались — просто проигнорируйте это письмо.
-    </p>
+    <p style="margin:24px 0 0;color:#555570;font-size:12px;text-align:center">Если вы не регистрировались — просто проигнорируйте это письмо.</p>
   </div>
 </div>
 </body></html>"""
-        msg.attach(MIMEText(html, "html"))
-        with smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10) as s:
-            s.login(smtp_user, smtp_pass)
-            s.sendmail(smtp_user, email, msg.as_string())
-    except Exception as e:
-        print(f"[EMAIL ERROR send_verify_email to {email}]: {e}", flush=True)
+    _send_resend(email, "Подтвердите email — Scriptor", html)
 
 
 def send_reset_email(email: str, token: str):
-    smtp_host = os.getenv("SMTP_HOST", "")
-    smtp_user = os.getenv("SMTP_USER", "")
-    smtp_pass = os.getenv("SMTP_PASS", "")
-    smtp_port = int(os.getenv("SMTP_PORT", "587"))
-    if not smtp_host or not smtp_user:
-        return
-    base_url = os.getenv("BASE_URL", "http://localhost:8000")
+    base_url = os.getenv("BASE_URL", "https://getscriptor.ru")
     link = f"{base_url}/?modal=reset&token={token}"
-    try:
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = "Сброс пароля — Scriptor"
-        msg["From"] = smtp_user
-        msg["To"] = email
-        html = f"""<!DOCTYPE html>
+    html = f"""<!DOCTYPE html>
 <html><body style="margin:0;padding:40px 0;background:#080810;font-family:'Segoe UI',Arial,sans-serif">
 <div style="max-width:480px;margin:0 auto;background:#0e0e1a;border-radius:16px;overflow:hidden;border:1px solid #1e1e30">
   <div style="background:linear-gradient(135deg,#7C6FFF,#FF6584);padding:28px;text-align:center">
@@ -880,26 +799,15 @@ def send_reset_email(email: str, token: str):
   </div>
   <div style="padding:32px">
     <h2 style="margin:0 0 12px;color:#eeeef8;font-size:20px">Сброс пароля</h2>
-    <p style="color:#9090b0;font-size:14px;line-height:1.6;margin:0 0 24px">
-      Вы запросили сброс пароля. Нажмите кнопку ниже — ссылка действует 1 час.
-    </p>
+    <p style="color:#9090b0;font-size:14px;line-height:1.6;margin:0 0 24px">Вы запросили сброс пароля. Нажмите кнопку ниже — ссылка действует 1 час.</p>
     <div style="text-align:center">
-      <a href="{link}" style="display:inline-block;background:linear-gradient(135deg,#7C6FFF,#5a52d5);color:#fff;text-decoration:none;padding:14px 36px;border-radius:10px;font-size:15px;font-weight:600">
-        Сбросить пароль →
-      </a>
+      <a href="{link}" style="display:inline-block;background:linear-gradient(135deg,#7C6FFF,#5a52d5);color:#fff;text-decoration:none;padding:14px 36px;border-radius:10px;font-size:15px;font-weight:600">Сбросить пароль →</a>
     </div>
-    <p style="margin:24px 0 0;color:#555570;font-size:12px;text-align:center">
-      Если вы не запрашивали сброс — просто проигнорируйте это письмо.
-    </p>
+    <p style="margin:24px 0 0;color:#555570;font-size:12px;text-align:center">Если вы не запрашивали сброс — просто проигнорируйте это письмо.</p>
   </div>
 </div>
 </body></html>"""
-        msg.attach(MIMEText(html, "html"))
-        with smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10) as s:
-            s.login(smtp_user, smtp_pass)
-            s.sendmail(smtp_user, email, msg.as_string())
-    except Exception as e:
-        print(f"[EMAIL ERROR send_reset_email to {email}]: {e}", flush=True)
+    _send_resend(email, "Сброс пароля — Scriptor", html)
 
 
 class ResendVerifyRequest(BaseModel):
