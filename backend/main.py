@@ -933,7 +933,8 @@ def startup():
             "ALTER TABLE users ADD COLUMN reset_token_expires TEXT",
             "CREATE TABLE IF NOT EXISTS feedback (id INTEGER PRIMARY KEY, email TEXT, message TEXT NOT NULL, status TEXT DEFAULT 'new', resolution TEXT, created_at TEXT, updated_at TEXT)",
             "ALTER TABLE users ADD COLUMN balance REAL DEFAULT 0.0",
-            "ALTER TABLE users ADD COLUMN plan_paid_at TEXT",
+            "ALTER TABLE users ADD COLUMN plan_paid_at TIMESTAMP",
+            "ALTER TABLE users ALTER COLUMN plan_paid_at TYPE TIMESTAMP USING plan_paid_at::TIMESTAMP",
             "CREATE TABLE IF NOT EXISTS error_logs (id INTEGER PRIMARY KEY, path TEXT, method TEXT, error TEXT, traceback TEXT, created_at TEXT)",
         ]:
             try:
