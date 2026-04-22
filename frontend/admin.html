@@ -195,6 +195,7 @@
       border-radius: 10px; min-width: 160px; z-index: 100;
       overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
     }
+    .dropdown-menu.drop-up { top: auto; bottom: 110%; }
     .dropdown-menu.open { display: block; }
     .dropdown-item {
       display: block; width: 100%; padding: 10px 16px;
@@ -449,7 +450,13 @@
     document.querySelectorAll('.dropdown-menu.open').forEach(m => {
       if (m !== btn.nextElementSibling) m.classList.remove('open');
     });
-    btn.nextElementSibling.classList.toggle('open');
+    const menu = btn.nextElementSibling;
+    menu.classList.toggle('open');
+    if (menu.classList.contains('open')) {
+      menu.classList.remove('drop-up');
+      const rect = menu.getBoundingClientRect();
+      if (rect.bottom > window.innerHeight) menu.classList.add('drop-up');
+    }
   }
   document.addEventListener('click', e => {
     if (!e.target.closest('.dropdown')) {
