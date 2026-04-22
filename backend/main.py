@@ -753,6 +753,29 @@ def admin_delete_user(user_id: int, token: str = "", db: Session = Depends(get_d
     return {"ok": True}
 
 
+@app.get("/api/admin/test-email")
+def admin_test_email(to: str, token: str = "", db: Session = Depends(get_db)):
+    _check_admin(token)
+    smtp_host = os.getenv("SMTP_HOST", "")
+    smtp_user = os.getenv("SMTP_USER", "")
+    smtp_pass = os.getenv("SMTP_PASS", "")
+    smtp_port = int(os.getenv("SMTP_PORT", "465"))
+    if not smtp_host or not smtp_user:
+        return {"ok": False, "error": "SMTP not configured", "host": smtp_host, "user": smtp_user}
+    try:
+        from email.mime.text import MIMEText
+        msg = MIMEText("Тестовое письмо от Scriptor", "plain", "utf-8")
+        msg["Subject"] = "Тест SMTP — Scriptor"
+        msg["From"] = smtp_user
+        msg["To"] = to
+        with smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10) as s:
+            s.login(smtp_user, smtp_pass)
+            s.sendmail(smtp_user, to, msg.as_string())
+        return {"ok": True, "from": smtp_user, "to": to, "host": smtp_host, "port": smtp_port}
+    except Exception as e:
+        return {"ok": False, "error": str(e), "host": smtp_host, "user": smtp_user, "port": smtp_port}
+
+
 @app.post("/api/admin/set-password")
 def admin_set_password(body: dict, token: str = "", db: Session = Depends(get_db)):
     _check_admin(token)
