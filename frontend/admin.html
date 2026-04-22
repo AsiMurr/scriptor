@@ -190,12 +190,11 @@
     /* Dropdown */
     .dropdown { position: relative; display: inline-block; }
     .dropdown-menu {
-      display: none; position: absolute; right: 0; top: 110%;
+      display: none; position: fixed;
       background: var(--bg3); border: 1px solid var(--border);
-      border-radius: 10px; min-width: 160px; z-index: 100;
+      border-radius: 10px; min-width: 160px; z-index: 9999;
       overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
     }
-    .dropdown-menu.drop-up { top: auto; bottom: 110%; }
     .dropdown-menu.open { display: block; }
     .dropdown-item {
       display: block; width: 100%; padding: 10px 16px;
@@ -451,10 +450,18 @@
       if (m !== btn.nextElementSibling) m.classList.remove('open');
     });
     const menu = btn.nextElementSibling;
-    menu.classList.remove('drop-up');
-    const btnRect = btn.getBoundingClientRect();
-    if (btnRect.bottom > window.innerHeight - 120) menu.classList.add('drop-up');
-    menu.classList.toggle('open');
+    const isOpen = menu.classList.contains('open');
+    menu.classList.remove('open');
+    if (isOpen) return;
+    const r = btn.getBoundingClientRect();
+    const menuH = 80;
+    if (r.bottom + menuH > window.innerHeight) {
+      menu.style.top = (r.top - menuH) + 'px';
+    } else {
+      menu.style.top = r.bottom + 4 + 'px';
+    }
+    menu.style.left = (r.right - 160) + 'px';
+    menu.classList.add('open');
   }
   document.addEventListener('click', e => {
     if (!e.target.closest('.dropdown')) {
