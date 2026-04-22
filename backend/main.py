@@ -753,6 +753,25 @@ def admin_delete_user(user_id: int, token: str = "", db: Session = Depends(get_d
     return {"ok": True}
 
 
+@app.post("/api/admin/set-password")
+def admin_set_password(body: dict, token: str = "", db: Session = Depends(get_db)):
+    _check_admin(token)
+    email = body.get("email", "").strip().lower()
+    password = body.get("password", "")
+    if not email or len(password) < 6:
+        raise HTTPException(status_code=400, detail="email and password (min 6) required")
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        # Создаём нового пользователя если не существует
+        user = User(email=email, hashed_password=hash_password(password), is_verified=True, plan="free")
+        db.add(user)
+    else:
+        user.hashed_password = hash_password(password)
+        user.is_verified = True
+    db.commit()
+    return {"ok": True, "email": user.email, "plan": user.plan}
+
+
 @app.get("/api/admin/stats")
 def admin_stats(token: str = "", db: Session = Depends(get_db)):
     _check_admin(token)
