@@ -728,6 +728,14 @@ def admin_test_email(to: str, token: str = "", db: Session = Depends(get_db)):
         return {"ok": False, "error": str(e)}
 
 
+@app.get("/api/admin/db-info")
+def admin_db_info(token: str = ""):
+    _check_admin(token)
+    url = os.getenv("DATABASE_URL", "NOT SET")
+    masked = url[:20] + "..." if len(url) > 20 else url
+    return {"database_url_prefix": masked, "is_postgres": url.startswith("postgres")}
+
+
 @app.post("/api/admin/set-password")
 def admin_set_password(body: dict, token: str = "", db: Session = Depends(get_db)):
     _check_admin(token)
