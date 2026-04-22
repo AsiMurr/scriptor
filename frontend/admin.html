@@ -103,7 +103,7 @@
 
     /* Stats */
     .stats-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr);
+      display: grid; grid-template-columns: repeat(5, 1fr);
       gap: 16px; margin-bottom: 32px;
     }
     .stat-card {
@@ -125,6 +125,7 @@
     .stat-card.active .stat-value { color: var(--success); }
     .stat-card.free .stat-value { color: var(--primary); }
     .stat-card.paid .stat-value { color: var(--accent); }
+    .stat-card.revenue .stat-value { color: #4caf50; font-size: 28px; }
 
     /* Filters */
     .filters {
@@ -287,6 +288,10 @@
         <div class="stat-label">Платных</div>
         <div class="stat-value" id="stat-paid">—</div>
       </div>
+      <div class="stat-card revenue">
+        <div class="stat-label">Выручка за месяц</div>
+        <div class="stat-value" id="stat-revenue">—</div>
+      </div>
     </div>
 
     <!-- Filters -->
@@ -399,6 +404,7 @@
       document.getElementById('stat-active').textContent = stats.active;
       document.getElementById('stat-free').textContent = stats.free;
       document.getElementById('stat-paid').textContent = stats.paid;
+      document.getElementById('stat-revenue').textContent = (stats.revenue_month || 0).toLocaleString('ru-RU') + ' ₽';
       renderTable();
     } catch(e) {
       document.getElementById('login-error').textContent = 'Ошибка соединения';

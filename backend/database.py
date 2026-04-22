@@ -31,6 +31,7 @@ class User(Base):
     reset_token = Column(String, nullable=True)
     reset_token_expires = Column(DateTime, nullable=True)
     balance = Column(Float, default=0.0)             # баланс в рублях
+    plan_paid_at = Column(DateTime, nullable=True)   # когда перешёл на платный тариф
 
 
 class Transcription(Base):

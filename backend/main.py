@@ -687,7 +687,12 @@ def admin_update_user(user_id: int, data: AdminUserUpdate, token: str = "", db: 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     if data.plan is not None:
+        from datetime import datetime
         user.plan = data.plan
+        if data.plan in ("standard", "pro"):
+            user.plan_paid_at = datetime.utcnow()
+        else:
+            user.plan_paid_at = None
     if data.is_active is not None:
         user.is_active = data.is_active
     if data.balance is not None:
@@ -757,16 +762,26 @@ def admin_set_password(body: dict, token: str = "", db: Session = Depends(get_db
 
 @app.get("/api/admin/stats")
 def admin_stats(token: str = "", db: Session = Depends(get_db)):
+    from datetime import datetime
     _check_admin(token)
     total = db.query(User).count()
     active = db.query(User).filter(User.is_active == True, User.plan != "free").count()
     free = db.query(User).filter(User.plan == "free").count()
     paid = db.query(User).filter(User.plan.in_(["standard", "pro"])).count()
+    now = datetime.utcnow()
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    PLAN_PRICES = {"standard": 399, "pro": 890}
+    paid_this_month = db.query(User).filter(
+        User.plan_paid_at >= month_start,
+        User.plan.in_(["standard", "pro"])
+    ).all()
+    revenue = sum(PLAN_PRICES.get(u.plan, 0) for u in paid_this_month)
     return {
         "total": total,
         "active": active,
         "free": free,
         "paid": paid,
+        "revenue_month": revenue,
     }
 
 
@@ -918,6 +933,7 @@ def startup():
             "ALTER TABLE users ADD COLUMN reset_token_expires TEXT",
             "CREATE TABLE IF NOT EXISTS feedback (id INTEGER PRIMARY KEY, email TEXT, message TEXT NOT NULL, status TEXT DEFAULT 'new', resolution TEXT, created_at TEXT, updated_at TEXT)",
             "ALTER TABLE users ADD COLUMN balance REAL DEFAULT 0.0",
+            "ALTER TABLE users ADD COLUMN plan_paid_at TEXT",
             "CREATE TABLE IF NOT EXISTS error_logs (id INTEGER PRIMARY KEY, path TEXT, method TEXT, error TEXT, traceback TEXT, created_at TEXT)",
         ]:
             try:
