@@ -5,7 +5,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-import tempfile, os, pathlib, io, smtplib, time, asyncio, traceback as tb
+import tempfile, os, pathlib, io, smtplib, time, asyncio, traceback as tb, threading
 import httpx
 import requests as req_lib
 from email.mime.text import MIMEText
@@ -226,7 +226,7 @@ def send_welcome_email(email: str, password: str):
 </body>
 </html>"""
         msg.attach(MIMEText(html, "html"))
-        with smtplib.SMTP_SSL(smtp_host, smtp_port) as s:
+        with smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10) as s:
             s.login(smtp_user, smtp_pass)
             s.sendmail(smtp_user, email, msg.as_string())
     except Exception as e:
@@ -248,8 +248,8 @@ def register(req: RegisterRequest, request: Request, db: Session = Depends(get_d
     db.add(user)
     db.commit()
     db.refresh(user)
-    send_welcome_email(req.email, req.password)
-    send_verify_email(req.email, verify_token)
+    threading.Thread(target=send_welcome_email, args=(req.email, req.password), daemon=True).start()
+    threading.Thread(target=send_verify_email, args=(req.email, verify_token), daemon=True).start()
     return TokenResponse(access_token=create_access_token(user.id, user.email))
 
 
@@ -808,7 +808,7 @@ def send_verify_email(email: str, token: str):
 </div>
 </body></html>"""
         msg.attach(MIMEText(html, "html"))
-        with smtplib.SMTP_SSL(smtp_host, smtp_port) as s:
+        with smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10) as s:
             s.login(smtp_user, smtp_pass)
             s.sendmail(smtp_user, email, msg.as_string())
     except Exception as e:
@@ -853,7 +853,7 @@ def send_reset_email(email: str, token: str):
 </div>
 </body></html>"""
         msg.attach(MIMEText(html, "html"))
-        with smtplib.SMTP_SSL(smtp_host, smtp_port) as s:
+        with smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10) as s:
             s.login(smtp_user, smtp_pass)
             s.sendmail(smtp_user, email, msg.as_string())
     except Exception as e:
@@ -873,7 +873,7 @@ def resend_verify(req: ResendVerifyRequest, db: Session = Depends(get_db)):
     if not user.verify_token:
         user.verify_token = secrets.token_urlsafe(32)
         db.commit()
-    send_verify_email(user.email, user.verify_token)
+    threading.Thread(target=send_verify_email, args=(user.email, user.verify_token), daemon=True).start()
     return {"ok": True}
 
 
@@ -900,7 +900,7 @@ def forgot_password(body: dict, request: Request, db: Session = Depends(get_db))
         user.reset_token = token
         user.reset_token_expires = datetime.utcnow() + timedelta(hours=1)
         db.commit()
-        send_reset_email(email, token)
+        threading.Thread(target=send_reset_email, args=(email, token), daemon=True).start()
     # Всегда отвечаем одинаково — не раскрываем существует ли email
     return {"ok": True}
 
