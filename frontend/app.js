@@ -1,7 +1,10 @@
 const API = '';
-const token = localStorage.getItem('vt_token') || localStorage.getItem('vt_guest_token');
+const token = localStorage.getItem('vt_token');
 
-if (!token) window.location.href = '/';
+if (!token) {
+  localStorage.removeItem('vt_guest_token');
+  window.location.href = '/';
+}
 
 let selectedFile = null;
 let lastResultText = '';

@@ -193,21 +193,14 @@ def send_welcome_email(email: str, password: str):
     <table width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
         <td width="22" style="vertical-align:top;padding:4px 0;color:#eeeef8;font-size:14px">✅</td>
-        <td style="vertical-align:top;padding:4px 16px 4px 6px;color:#eeeef8;font-size:14px;line-height:1.4;width:50%"><b>20 минут</b> бесплатно каждый месяц</td>
+        <td style="vertical-align:top;padding:4px 16px 4px 6px;color:#eeeef8;font-size:14px;line-height:1.4;width:50%"><b>30 минут</b> бесплатно каждый месяц</td>
         <td width="22" style="vertical-align:top;padding:4px 0;color:#eeeef8;font-size:14px">✅</td>
         <td style="vertical-align:top;padding:4px 0 4px 6px;color:#eeeef8;font-size:14px;line-height:1.4"><b>История</b> всех транскрипций</td>
       </tr>
       <tr><td colspan="4" height="6"></td></tr>
       <tr>
         <td width="22" style="vertical-align:top;padding:4px 0;color:#eeeef8;font-size:14px">✅</td>
-        <td style="vertical-align:top;padding:4px 16px 4px 6px;color:#eeeef8;font-size:14px;line-height:1.4"><b>Редактирование</b> текста</td>
-        <td width="22" style="vertical-align:top;padding:4px 0;color:#eeeef8;font-size:14px">✅</td>
-        <td style="vertical-align:top;padding:4px 0 4px 6px;color:#eeeef8;font-size:14px;line-height:1.4"><b>Переименование</b> спикеров</td>
-      </tr>
-      <tr><td colspan="4" height="6"></td></tr>
-      <tr>
-        <td width="22" style="vertical-align:top;padding:4px 0;color:#eeeef8;font-size:14px">✅</td>
-        <td style="vertical-align:top;padding:4px 16px 4px 6px;color:#eeeef8;font-size:14px;line-height:1.4"><b>Запись голоса</b> в браузере</td>
+        <td style="vertical-align:top;padding:4px 16px 4px 6px;color:#eeeef8;font-size:14px;line-height:1.4">Все форматы: <b>MP3, WAV, MP4</b> и другие</td>
         <td width="22" style="vertical-align:top;padding:4px 0;color:#eeeef8;font-size:14px">✅</td>
         <td style="vertical-align:top;padding:4px 0 4px 6px;color:#eeeef8;font-size:14px;line-height:1.4">Экспорт в <b>Word, PDF, Excel, TXT</b></td>
       </tr>

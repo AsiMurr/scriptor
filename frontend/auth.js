@@ -185,22 +185,8 @@ async function doReset() {
   }
 }
 
-async function tryAsGuest() {
-  // Если уже есть гостевой токен — используем его (лимит сохраняется)
-  const existing = localStorage.getItem('vt_guest_token');
-  if (existing) {
-    window.location.href = '/app';
-    return;
-  }
-  try {
-    const res = await fetch(`${API}/api/auth/guest`, { method: 'POST' });
-    const data = await res.json();
-    if (!res.ok) { alert('Ошибка. Попробуй снова.'); return; }
-    localStorage.setItem('vt_guest_token', data.access_token);
-    window.location.href = '/app';
-  } catch {
-    alert('Ошибка сети. Попробуй снова.');
-  }
+function tryAsGuest() {
+  openModal('register');
 }
 
 async function doFeedback() {
