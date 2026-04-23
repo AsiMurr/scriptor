@@ -927,28 +927,41 @@ if frontend_path.exists():
 
 # ─── Startup ─────────────────────────────────────────────────────────────────
 
+def _run_migrations():
+    from sqlalchemy import text
+    migrations = [
+        "ALTER TABLE transcriptions ADD COLUMN IF NOT EXISTS tags TEXT DEFAULT ''",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_verified INTEGER DEFAULT 0",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS verify_token TEXT",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token TEXT",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires TEXT",
+        "CREATE TABLE IF NOT EXISTS feedback (id SERIAL PRIMARY KEY, email TEXT, message TEXT NOT NULL, status TEXT DEFAULT 'new', resolution TEXT, created_at TEXT, updated_at TEXT)",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS balance REAL DEFAULT 0.0",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS plan_paid_at TIMESTAMP",
+        "CREATE TABLE IF NOT EXISTS error_logs (id SERIAL PRIMARY KEY, path TEXT, method TEXT, error TEXT, traceback TEXT, created_at TEXT)",
+    ]
+    results = []
+    with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
+        for migration in migrations:
+            try:
+                conn.execute(text(migration))
+                results.append({"sql": migration[:60], "status": "ok"})
+            except Exception as e:
+                results.append({"sql": migration[:60], "status": f"error: {e}"})
+    return results
+
+
+@app.get("/api/admin/run-migrations")
+def admin_run_migrations(token: str = ""):
+    _check_admin(token)
+    results = _run_migrations()
+    return {"results": results}
+
+
 @app.on_event("startup")
 def startup():
     init_db()
-    from sqlalchemy import text
-    with engine.connect() as conn:
-        for migration in [
-            "ALTER TABLE transcriptions ADD COLUMN tags TEXT DEFAULT ''",
-            "ALTER TABLE users ADD COLUMN is_verified INTEGER DEFAULT 0",
-            "ALTER TABLE users ADD COLUMN verify_token TEXT",
-            "ALTER TABLE users ADD COLUMN reset_token TEXT",
-            "ALTER TABLE users ADD COLUMN reset_token_expires TEXT",
-            "CREATE TABLE IF NOT EXISTS feedback (id INTEGER PRIMARY KEY, email TEXT, message TEXT NOT NULL, status TEXT DEFAULT 'new', resolution TEXT, created_at TEXT, updated_at TEXT)",
-            "ALTER TABLE users ADD COLUMN balance REAL DEFAULT 0.0",
-            "ALTER TABLE users ADD COLUMN plan_paid_at TIMESTAMP",
-            "ALTER TABLE users ALTER COLUMN plan_paid_at TYPE TIMESTAMP USING plan_paid_at::TIMESTAMP",
-            "CREATE TABLE IF NOT EXISTS error_logs (id INTEGER PRIMARY KEY, path TEXT, method TEXT, error TEXT, traceback TEXT, created_at TEXT)",
-        ]:
-            try:
-                conn.execute(text(migration))
-                conn.commit()
-            except Exception:
-                pass  # column already exists
+    _run_migrations()
 
 
 if __name__ == "__main__":
