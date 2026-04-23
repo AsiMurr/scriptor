@@ -46,7 +46,6 @@ async function loadUserInfo() {
     document.getElementById('user-email').textContent = data.plan === 'guest' ? 'Гость' : data.email;
     if (data.plan === 'guest') {
       isGuest = true;
-      document.getElementById('guest-banner').style.display = '';
       document.getElementById('result-text').readOnly = true;
       document.getElementById('record-btn').closest('.record-row').style.display = 'none';
     }
