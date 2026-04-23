@@ -392,6 +392,12 @@
       ]);
       if (usersRes.status === 403) {
         document.getElementById('login-error').textContent = 'Неверный токен';
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('admin-panel').style.display = 'none';
+        return;
+      }
+      if (!usersRes.ok || !statsRes.ok) {
+        document.getElementById('login-error').textContent = `Ошибка сервера (${usersRes.status}). Проверьте Railway.`;
         return;
       }
       document.getElementById('login-error').textContent = '';
@@ -407,7 +413,9 @@
       document.getElementById('stat-revenue').textContent = (stats.revenue_month || 0).toLocaleString('ru-RU') + ' ₽';
       renderTable();
     } catch(e) {
-      document.getElementById('login-error').textContent = 'Ошибка соединения';
+      document.getElementById('login-error').textContent = 'Ошибка соединения — бэкенд недоступен';
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('admin-panel').style.display = 'none';
     }
   }
 

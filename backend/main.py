@@ -187,10 +187,17 @@ def send_welcome_email(email: str, password: str):
     _send_resend(email, "Добро пожаловать в Scriptor", html)
 
 
+def _get_ip(request: Request) -> str:
+    forwarded = request.headers.get("X-Forwarded-For", "")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
 @app.post("/api/auth/register", response_model=TokenResponse)
 def register(req: RegisterRequest, request: Request, db: Session = Depends(get_db)):
     import secrets
-    ip = request.client.host
+    ip = _get_ip(request)
     check_register_rate(ip)
     if db.query(User).filter(User.email == req.email).first():
         raise HTTPException(status_code=400, detail="Email уже зарегистрирован")
@@ -209,7 +216,7 @@ def register(req: RegisterRequest, request: Request, db: Session = Depends(get_d
 
 @app.post("/api/auth/login", response_model=TokenResponse)
 def login(req: LoginRequest, request: Request, db: Session = Depends(get_db)):
-    ip = request.client.host
+    ip = _get_ip(request)
     check_login_rate(ip)
     user = db.query(User).filter(User.email == req.email).first()
     if not user or not verify_password(req.password, user.hashed_password):
@@ -596,7 +603,7 @@ class FeedbackRequest(BaseModel):
 
 @app.post("/api/feedback")
 def submit_feedback(req: FeedbackRequest, request: Request, db: Session = Depends(get_db)):
-    ip = request.client.host
+    ip = _get_ip(request)
     now = time.time()
     hour_ago = now - 3600
     attempts = [t for t in _feedback_attempts[ip] if t > hour_ago]
