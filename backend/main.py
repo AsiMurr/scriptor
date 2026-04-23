@@ -26,7 +26,7 @@ app = FastAPI(title="Scriptor API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://getscriptor.ru", "https://www.getscriptor.ru"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
