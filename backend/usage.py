@@ -6,7 +6,7 @@ from database import Transcription, User
 # Лимиты по тарифам (в минутах)
 PLAN_LIMITS = {
     "guest": 10,
-    "free": 30,        # 30 минут
+    "free": 60,        # 60 минут
     "standard": 600,   # 10 часов
     "pro": 1800,       # 30 часов
 }
@@ -38,8 +38,10 @@ def get_remaining_minutes(user: User, db: Session) -> float:
 def check_quota(user: User, db: Session):
     remaining = get_remaining_minutes(user, db)
     if remaining <= 0:
+        limits_text = {"free": "60 мин", "standard": "10 часов", "pro": "30 часов"}
         raise Exception(
-            f"Лимит исчерпан. Ваш тариф «{user.plan}» включает "
-            f"{PLAN_LIMITS[user.plan]} мин/мес. Обновите тариф для продолжения."
+            f"Лимит исчерпан. Ваш тариф «{PLAN_NAMES.get(user.plan, user.plan)}» включает "
+            f"{limits_text.get(user.plan, str(PLAN_LIMITS[user.plan]) + ' мин')}/мес. "
+            f"Обновите тариф для продолжения."
         )
     return remaining
