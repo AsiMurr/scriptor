@@ -15,7 +15,7 @@ import assemblyai as aai
 
 from database import get_db, User, Transcription, Feedback, ErrorLog, init_db, engine
 from auth import hash_password, verify_password, create_access_token, create_guest_token, get_current_user
-from usage import get_used_minutes_this_month, get_remaining_minutes, check_quota, PLAN_LIMITS
+from usage import get_used_minutes_this_month, get_remaining_minutes, check_quota, PLAN_LIMITS, PLAN_FEATURES
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -82,6 +82,7 @@ class UserInfo(BaseModel):
     limit_minutes: float | str
     remaining_minutes: float | str
     balance: float
+    features: dict
 
 
 # ─── Rate limiting ───────────────────────────────────────────────────────────
@@ -249,6 +250,7 @@ def me(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
         limit_minutes=limit,
         remaining_minutes=round(remaining, 2),
         balance=round(user.balance or 0.0, 2),
+        features=PLAN_FEATURES[user.plan],
     )
 
 
@@ -431,6 +433,8 @@ def update_history_item(
     if not row:
         raise HTTPException(status_code=404, detail="Не найдено")
     if "text" in body:
+        if not PLAN_FEATURES[user.plan]["edit"]:
+            raise HTTPException(status_code=403, detail="Редактирование текста недоступно на вашем тарифе. Обновите до Стандарт.")
         row.text = body["text"]
     if "tags" in body:
         row.tags = body["tags"]
@@ -520,6 +524,9 @@ def download_history_item(
 
 @app.post("/api/download")
 def download_text_body(body: DownloadRequest, user: User = Depends(get_current_user)):
+    if body.fmt not in PLAN_FEATURES[user.plan]["export"]:
+        upgrade = "Стандарт" if body.fmt == "docx" else "Про"
+        raise HTTPException(status_code=403, detail=f"Формат {body.fmt.upper()} недоступен на вашем тарифе. Обновите до «{upgrade}».")
     base_name = pathlib.Path(body.filename).stem or "transcription"
     text = body.text
     fmt = body.fmt

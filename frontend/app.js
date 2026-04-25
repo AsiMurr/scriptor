@@ -12,6 +12,7 @@ let lastResultId = null;
 let lastFilename = 'transcription';
 let allHistoryItems = [];
 let isGuest = false;
+let userFeatures = { record: false, edit: false, speakers: 0, export: ['txt'], history_days: 30 };
 
 // ── Init ──────────────────────────────────────────────────────────
 
@@ -44,10 +45,14 @@ async function loadUserInfo() {
     const data = await res.json();
 
     document.getElementById('user-email').textContent = data.plan === 'guest' ? 'Гость' : data.email;
-    if (data.plan === 'guest') {
-      isGuest = true;
-      document.getElementById('result-text').readOnly = true;
+    isGuest = data.plan === 'guest';
+    if (data.features) userFeatures = data.features;
+
+    if (!userFeatures.record) {
       document.getElementById('record-btn').closest('.record-row').style.display = 'none';
+    }
+    if (!userFeatures.edit) {
+      document.getElementById('result-text').readOnly = true;
     }
 
     const widget = document.getElementById('account-widget');
@@ -258,13 +263,19 @@ async function openHistoryItem(id) {
 function updateDownloadButtons(id) {
   const wrap = document.getElementById('download-buttons');
   if (!wrap) return;
-  wrap.innerHTML = `
-    <button class="btn btn-sm btn-outline" onclick="copyText()">📋 Копировать</button>
-    <button class="btn btn-sm btn-outline" onclick="downloadFmt(${id},'txt')">TXT</button>
-    <button class="btn btn-sm btn-outline" onclick="downloadFmt(${id},'docx')">Word</button>
-    <button class="btn btn-sm btn-outline" onclick="downloadFmt(${id},'pdf')">PDF</button>
-    <button class="btn btn-sm btn-outline" onclick="downloadFmt(${id},'xlsx')">Excel</button>
-  `;
+  const fmts = [
+    { fmt: 'txt',  label: 'TXT',   upgrade: null },
+    { fmt: 'docx', label: 'Word',  upgrade: 'Стандарт' },
+    { fmt: 'pdf',  label: 'PDF',   upgrade: 'Про' },
+    { fmt: 'xlsx', label: 'Excel', upgrade: 'Про' },
+  ];
+  const allowed = userFeatures.export || ['txt'];
+  wrap.innerHTML = `<button class="btn btn-sm btn-outline" onclick="copyText()">📋 Копировать</button>` +
+    fmts.map(({ fmt, label, upgrade }) =>
+      allowed.includes(fmt)
+        ? `<button class="btn btn-sm btn-outline" onclick="downloadFmt(${id},'${fmt}')">${label}</button>`
+        : `<button class="btn btn-sm btn-outline" style="opacity:0.45;cursor:default" title="Доступно в тарифе «${upgrade}»" disabled>${label} 🔒</button>`
+    ).join('');
 }
 
 async function downloadFmt(id, fmt) {
@@ -410,7 +421,7 @@ async function toggleRecord() {
 // ── Edit & Save ────────────────────────────────────────────────────
 
 function onTextEdit() {
-  if (isGuest) return;
+  if (!userFeatures.edit) return;
   document.getElementById('save-btn').style.display = '';
 }
 
@@ -452,7 +463,7 @@ function extractSpeakers(text) {
 function renderSpeakerPanel(speakers) {
   const panel = document.getElementById('speaker-panel');
   const inputs = document.getElementById('speaker-inputs');
-  if (!speakers.length || isGuest) { panel.style.display = 'none'; return; }
+  if (!speakers.length || userFeatures.speakers === 0) { panel.style.display = 'none'; return; }
   inputs.innerHTML = speakers.map(s => `
     <div class="speaker-row">
       <span class="speaker-label">Спикер ${s}</span>

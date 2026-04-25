@@ -18,6 +18,13 @@ PLAN_NAMES = {
     "pro": "Про",
 }
 
+PLAN_FEATURES = {
+    "guest":    {"record": False, "edit": False, "speakers": 0,  "export": ["txt"],                         "history_days": 0},
+    "free":     {"record": False, "edit": False, "speakers": 0,  "export": ["txt"],                         "history_days": 30},
+    "standard": {"record": True,  "edit": True,  "speakers": 5,  "export": ["txt", "docx"],                "history_days": 90},
+    "pro":      {"record": True,  "edit": True,  "speakers": 10, "export": ["txt", "docx", "pdf", "xlsx"], "history_days": None},
+}
+
 
 def get_used_minutes_this_month(user_id: int, db: Session) -> float:
     now = datetime.utcnow()
