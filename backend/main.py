@@ -388,7 +388,7 @@ def history(
     db: Session = Depends(get_db),
     limit: int = 20,
 ):
-    if user.plan == "guest":
+    if user.plan in ("guest", "free"):
         return []
     rows = (
         db.query(Transcription)
@@ -416,6 +416,8 @@ def history_item(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    if user.plan in ("guest", "free"):
+        raise HTTPException(status_code=403, detail="История доступна в платных тарифах")
     row = db.query(Transcription).filter(Transcription.id == item_id, Transcription.user_id == user.id).first()
     if not row:
         raise HTTPException(status_code=404, detail="Не найдено")

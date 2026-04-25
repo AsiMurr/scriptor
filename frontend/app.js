@@ -201,11 +201,14 @@ function downloadText(fmt) {
 // ── History ────────────────────────────────────────────────────────
 
 async function loadHistory() {
+  if (userFeatures.history_days === 0 && !isGuest) {
+    document.getElementById('history-list').innerHTML =
+      '<p class="history-empty">История сохраняется в тарифах <a href="/#pricing" style="color:#7C6FFF">Стандарт и Про →</a></p>';
+    return;
+  }
   try {
     const res = await authFetch(`${API}/api/history`);
     const items = await res.json();
-    const list = document.getElementById('history-list');
-
     allHistoryItems = items;
     renderHistoryList(items);
   } catch (e) {
