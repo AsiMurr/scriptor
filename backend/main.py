@@ -398,15 +398,18 @@ def history(
     db: Session = Depends(get_db),
     limit: int = 20,
 ):
-    if user.plan in ("guest", "free"):
+    if user.plan == "guest":
         return []
-    rows = (
-        db.query(Transcription)
-        .filter(Transcription.user_id == user.id)
-        .order_by(Transcription.created_at.desc())
-        .limit(limit)
-        .all()
-    )
+    from datetime import datetime, timedelta
+    features = PLAN_FEATURES[user.plan]
+    history_days = features.get("history_days", 0)
+    if history_days == 0:
+        return []
+    query = db.query(Transcription).filter(Transcription.user_id == user.id)
+    if history_days is not None:
+        cutoff = datetime.utcnow() - timedelta(days=history_days)
+        query = query.filter(Transcription.created_at >= cutoff)
+    rows = query.order_by(Transcription.created_at.desc()).limit(limit).all()
     return [
         {
             "id": r.id,
@@ -426,7 +429,7 @@ def history_item(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    if user.plan in ("guest", "free"):
+    if user.plan == "guest" or PLAN_FEATURES[user.plan].get("history_days", 0) == 0:
         raise HTTPException(status_code=403, detail="История доступна в платных тарифах")
     row = db.query(Transcription).filter(Transcription.id == item_id, Transcription.user_id == user.id).first()
     if not row:

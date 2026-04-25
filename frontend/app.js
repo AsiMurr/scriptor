@@ -222,6 +222,14 @@ async function loadHistory() {
     const items = await res.json();
     allHistoryItems = items;
     renderHistoryList(items);
+    if (userFeatures.history_days === 7 && !isGuest) {
+      const list = document.getElementById('history-list');
+      const notice = document.createElement('p');
+      notice.className = 'history-empty';
+      notice.style.cssText = 'font-size:12px;margin-bottom:8px;';
+      notice.innerHTML = '🕐 История хранится 7 дней · <a href="/#pricing" style="color:#7C6FFF">Стандарт — 3 месяца →</a>';
+      list.prepend(notice);
+    }
   } catch (e) {
     console.error('loadHistory error', e);
   }
