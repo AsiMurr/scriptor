@@ -55,6 +55,14 @@ async function loadUserInfo() {
       document.getElementById('result-text').readOnly = true;
     }
 
+    // Видео: обновить accept и подсказку форматов
+    const videoFormats = userFeatures.video ? ',.mp4,.mov,.avi,.mkv' : '';
+    document.getElementById('file-input').setAttribute('accept', `.mp3,.wav,.ogg,.m4a,.webm,.flac${videoFormats}`);
+    const hint = document.getElementById('format-hint');
+    if (hint) hint.textContent = userFeatures.video
+      ? 'MP3, WAV, OGG, MP4, MOV, AVI · до 200 МБ (видео)'
+      : 'MP3, WAV, OGG, M4A, WebM · до 25 МБ';
+
     const widget = document.getElementById('account-widget');
     const used = data.used_minutes;
     const limit = data.limit_minutes;
@@ -120,6 +128,9 @@ function setFile(file) {
   document.getElementById('file-size').textContent = formatSize(file.size);
   document.getElementById('file-info').style.display = 'flex';
   document.getElementById('transcribe-btn').disabled = false;
+  const isVideo = /\.(mp4|mov|avi|mkv)$/i.test(file.name);
+  const icon = document.getElementById('drop-zone-icon');
+  if (icon) icon.textContent = isVideo ? '🎬' : '🎵';
   hideResult(); hideError();
 }
 

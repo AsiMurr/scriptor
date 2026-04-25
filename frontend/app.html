@@ -43,13 +43,13 @@
 
     <!-- UPLOAD PANEL -->
     <section class="upload-panel">
-      <h2>Транскрибация аудио</h2>
+      <h2>Транскрибация аудио и видео</h2>
 
       <div class="drop-zone" id="drop-zone">
-        <div class="drop-icon">🎵</div>
+        <div class="drop-icon" id="drop-zone-icon">🎵</div>
         <p class="drop-text">Перетащи файл сюда или</p>
         <button class="btn btn-primary" id="pick-btn">Выбрать файл</button>
-        <p class="drop-formats">MP3, WAV, OGG, MP4, M4A, WebM · до 25 МБ</p>
+        <p class="drop-formats" id="format-hint">MP3, WAV, OGG, M4A, WebM · до 25 МБ</p>
         <div class="record-row">
           <button class="btn btn-record" id="record-btn" onclick="toggleRecord()"><span class="mic-icon">🎙</span> Записать с микрофона</button>
           <span class="record-timer" id="record-timer" style="display:none">00:00</span>
@@ -57,7 +57,7 @@
         <div id="record-viz" style="display:none" class="record-viz">
           <canvas id="record-canvas" width="260" height="36"></canvas>
         </div>
-        <input type="file" id="file-input" accept=".mp3,.wav,.ogg,.mp4,.m4a,.webm,.flac" style="display:none" />
+        <input type="file" id="file-input" accept=".mp3,.wav,.ogg,.m4a,.webm,.flac" style="display:none" />
       </div>
 
       <!-- Selected file info -->
@@ -120,6 +120,6 @@
 
   </main>
 
-  <script src="/static/app.js?v=3"></script>
+  <script src="/static/app.js?v=4"></script>
 </body>
 </html>

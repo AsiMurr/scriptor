@@ -19,10 +19,10 @@ PLAN_NAMES = {
 }
 
 PLAN_FEATURES = {
-    "guest":    {"record": False, "edit": False, "speakers": 0,  "export": ["txt"],                         "history_days": 0},
-    "free":     {"record": False, "edit": False, "speakers": 0,  "export": ["txt"],                         "history_days": 0},
-    "standard": {"record": True,  "edit": True,  "speakers": 5,  "export": ["txt", "docx"],                "history_days": 90},
-    "pro":      {"record": True,  "edit": True,  "speakers": 10, "export": ["txt", "docx", "pdf", "xlsx"], "history_days": None},
+    "guest":    {"record": False, "edit": False, "speakers": 0,  "export": ["txt"],                         "history_days": 0,  "video": False},
+    "free":     {"record": False, "edit": False, "speakers": 0,  "export": ["txt"],                         "history_days": 0,  "video": False},
+    "standard": {"record": True,  "edit": True,  "speakers": 5,  "export": ["txt", "docx"],                "history_days": 90, "video": True},
+    "pro":      {"record": True,  "edit": True,  "speakers": 10, "export": ["txt", "docx", "pdf", "xlsx"], "history_days": None, "video": True},
 }
 
 

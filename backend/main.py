@@ -256,8 +256,11 @@ def me(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
 
 # ─── Transcription ───────────────────────────────────────────────────────────
 
-ALLOWED_EXTENSIONS = {".mp3", ".mp4", ".m4a", ".wav", ".ogg", ".webm", ".flac"}
-MAX_FILE_SIZE_MB = 25
+AUDIO_EXTENSIONS = {".mp3", ".m4a", ".wav", ".ogg", ".webm", ".flac"}
+VIDEO_EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv"}
+ALLOWED_EXTENSIONS = AUDIO_EXTENSIONS | VIDEO_EXTENSIONS
+MAX_AUDIO_SIZE_MB = 25
+MAX_VIDEO_SIZE_MB = 200
 
 
 def _fmt_time(ms: int) -> str:
@@ -275,12 +278,19 @@ async def transcribe(
     # Проверка расширения
     ext = pathlib.Path(file.filename).suffix.lower()
     if ext not in ALLOWED_EXTENSIONS:
-        raise HTTPException(status_code=400, detail=f"Формат не поддерживается. Разрешены: {', '.join(ALLOWED_EXTENSIONS)}")
+        raise HTTPException(status_code=400, detail=f"Формат не поддерживается. Разрешены: {', '.join(sorted(ALLOWED_EXTENSIONS))}")
+
+    is_video = ext in VIDEO_EXTENSIONS
+    max_size = MAX_VIDEO_SIZE_MB if is_video else MAX_AUDIO_SIZE_MB
+
+    # Гейтинг видео по тарифу
+    if is_video and not PLAN_FEATURES[user.plan].get("video", False):
+        raise HTTPException(status_code=403, detail="Загрузка видео доступна в тарифах Стандарт и Про")
 
     # Читаем файл
     content = await file.read()
-    if len(content) > MAX_FILE_SIZE_MB * 1024 * 1024:
-        raise HTTPException(status_code=400, detail=f"Файл слишком большой. Максимум {MAX_FILE_SIZE_MB} МБ")
+    if len(content) > max_size * 1024 * 1024:
+        raise HTTPException(status_code=400, detail=f"Файл слишком большой. Максимум {max_size} МБ")
 
     # Проверка квоты
     try:
