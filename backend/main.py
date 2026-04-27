@@ -804,18 +804,35 @@ def admin_set_password(body: dict, token: str = "", db: Session = Depends(get_db
     return {"ok": True, "email": user.email, "plan": user.plan}
 
 
+@app.post("/api/admin/set-internal")
+def admin_set_internal(body: dict, token: str = "", db: Session = Depends(get_db)):
+    _check_admin(token)
+    email = body.get("email", "").strip().lower()
+    value = body.get("is_internal", True)
+    if not email:
+        raise HTTPException(status_code=400, detail="email required")
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.is_internal = value
+    db.commit()
+    return {"ok": True, "email": user.email, "is_internal": user.is_internal}
+
+
 @app.get("/api/admin/stats")
 def admin_stats(token: str = "", db: Session = Depends(get_db)):
     from datetime import datetime
     _check_admin(token)
-    total = db.query(User).count()
-    active = db.query(User).filter(User.is_active == True, User.plan != "free").count()
-    free = db.query(User).filter(User.plan == "free").count()
-    paid = db.query(User).filter(User.plan.in_(["standard", "pro"])).count()
+    real = User.is_internal == False
+    total = db.query(User).filter(real).count()
+    active = db.query(User).filter(real, User.is_active == True, User.plan != "free").count()
+    free = db.query(User).filter(real, User.plan == "free").count()
+    paid = db.query(User).filter(real, User.plan.in_(["standard", "pro"])).count()
     now = datetime.utcnow()
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     PLAN_PRICES = {"standard": 399, "pro": 890}
     paid_this_month = db.query(User).filter(
+        real,
         User.plan_paid_at >= month_start,
         User.plan.in_(["standard", "pro"])
     ).all()
@@ -976,6 +993,7 @@ def _run_migrations():
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS balance REAL DEFAULT 0.0",
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS plan_paid_at TIMESTAMP",
         "CREATE TABLE IF NOT EXISTS error_logs (id SERIAL PRIMARY KEY, path TEXT, method TEXT, error TEXT, traceback TEXT, created_at TEXT)",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_internal BOOLEAN DEFAULT FALSE",
     ]
     results = []
     with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
