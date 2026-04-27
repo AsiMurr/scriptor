@@ -402,7 +402,7 @@ async def transcribe_youtube(
     body = await request.json()
     url = body.get("url", "").strip()
 
-    yt_re = re.compile(r'(?:https?://)?(?:www\.)?(?:youtube\.com/watch\?v=|youtu\.be/)[\w\-]+')
+    yt_re = re.compile(r'(?:https?://)?(?:www\.)?(?:youtube\.com/(?:watch\?v=|shorts/|embed/)|youtu\.be/)[\w\-]+')
     if not yt_re.match(url):
         raise HTTPException(status_code=400, detail="Неверная ссылка YouTube")
 
