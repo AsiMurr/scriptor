@@ -129,7 +129,7 @@ def check_register_rate(ip: str):
 
 def _send_resend(to: str, subject: str, html: str) -> bool:
     api_key = os.getenv("RESEND_API_KEY", "")
-    from_addr = os.getenv("RESEND_FROM", "Scriptor <onboarding@resend.dev>")
+    from_addr = os.getenv("RESEND_FROM", "Scriptor <noreply@getscriptor.ru>")
     if not api_key:
         print("[EMAIL] RESEND_API_KEY not set", flush=True)
         return False
@@ -745,7 +745,7 @@ def admin_delete_user(user_id: int, token: str = "", db: Session = Depends(get_d
 def admin_test_email(to: str, token: str = "", db: Session = Depends(get_db)):
     _check_admin(token)
     api_key = os.getenv("RESEND_API_KEY", "")
-    from_addr = os.getenv("RESEND_FROM", "Scriptor <onboarding@resend.dev>")
+    from_addr = os.getenv("RESEND_FROM", "Scriptor <noreply@getscriptor.ru>")
     if not api_key:
         return {"ok": False, "error": "RESEND_API_KEY not set"}
     try:
