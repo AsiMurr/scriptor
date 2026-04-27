@@ -417,6 +417,34 @@ async def transcribe_youtube(
     api_key = os.getenv("ASSEMBLYAI_API_KEY")
     json_headers = {"authorization": api_key, "content-type": "application/json"}
 
+    def _download_audio(yt_url: str) -> bytes:
+        import yt_dlp, tempfile, glob as glob_mod
+        with tempfile.TemporaryDirectory() as tmpdir:
+            opts = {
+                "format": "bestaudio/best",
+                "outtmpl": f"{tmpdir}/audio.%(ext)s",
+                "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3", "preferredquality": "96"}],
+                "quiet": True,
+                "no_warnings": True,
+                "noplaylist": True,
+            }
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                ydl.download([yt_url])
+            files = glob_mod.glob(f"{tmpdir}/*")
+            if not files:
+                raise RuntimeError("yt-dlp: аудио не скачалось")
+            with open(files[0], "rb") as f:
+                return f.read()
+
+    def _upload(data: bytes) -> str:
+        r = req_lib.post(
+            "https://api.assemblyai.com/v2/upload",
+            headers={"authorization": api_key},
+            data=data, timeout=120,
+        )
+        r.raise_for_status()
+        return r.json()["upload_url"]
+
     def _create_transcript(audio_url: str) -> str:
         r = req_lib.post(
             "https://api.assemblyai.com/v2/transcript",
@@ -435,14 +463,15 @@ async def transcribe_youtube(
     def _poll(transcript_id: str) -> dict:
         r = req_lib.get(
             f"https://api.assemblyai.com/v2/transcript/{transcript_id}",
-            headers=json_headers,
-            timeout=30,
+            headers=json_headers, timeout=30,
         )
         r.raise_for_status()
         return r.json()
 
     try:
-        transcript_id = await asyncio.to_thread(_create_transcript, url)
+        audio_bytes = await asyncio.to_thread(_download_audio, url)
+        audio_url = await asyncio.to_thread(_upload, audio_bytes)
+        transcript_id = await asyncio.to_thread(_create_transcript, audio_url)
         result = None
         for _ in range(200):
             await asyncio.sleep(3)
