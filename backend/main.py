@@ -392,6 +392,109 @@ async def transcribe(
     }
 
 
+@app.post("/api/transcribe-youtube")
+async def transcribe_youtube(
+    request: Request,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    import re
+    body = await request.json()
+    url = body.get("url", "").strip()
+
+    yt_re = re.compile(r'(?:https?://)?(?:www\.)?(?:youtube\.com/watch\?v=|youtu\.be/)[\w\-]+')
+    if not yt_re.match(url):
+        raise HTTPException(status_code=400, detail="Неверная ссылка YouTube")
+
+    if user.plan == "guest":
+        raise HTTPException(status_code=403, detail="YouTube-транскрибация доступна только авторизованным пользователям")
+
+    try:
+        check_quota(user, db)
+    except Exception as e:
+        raise HTTPException(status_code=402, detail=str(e))
+
+    api_key = os.getenv("ASSEMBLYAI_API_KEY")
+    json_headers = {"authorization": api_key, "content-type": "application/json"}
+
+    def _create_transcript(audio_url: str) -> str:
+        r = req_lib.post(
+            "https://api.assemblyai.com/v2/transcript",
+            headers=json_headers,
+            json={
+                "audio_url": audio_url,
+                "speaker_labels": True,
+                "language_detection": True,
+                "speech_models": ["universal-2"],
+            },
+            timeout=30,
+        )
+        r.raise_for_status()
+        return r.json()["id"]
+
+    def _poll(transcript_id: str) -> dict:
+        r = req_lib.get(
+            f"https://api.assemblyai.com/v2/transcript/{transcript_id}",
+            headers=json_headers,
+            timeout=30,
+        )
+        r.raise_for_status()
+        return r.json()
+
+    try:
+        transcript_id = await asyncio.to_thread(_create_transcript, url)
+        result = None
+        for _ in range(200):
+            await asyncio.sleep(3)
+            result = await asyncio.to_thread(_poll, transcript_id)
+            if result.get("status") == "completed":
+                break
+            if result.get("status") == "error":
+                raise HTTPException(status_code=500, detail=f"Ошибка транскрибации: {result.get('error')}")
+        else:
+            raise HTTPException(status_code=504, detail="Превышено время ожидания. Попробуйте более короткое видео.")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка: {str(e)}")
+
+    duration_sec = result.get("audio_duration") or 0.0
+    utterances = result.get("utterances") or []
+    if utterances:
+        lines = []
+        for utt in utterances:
+            start = _fmt_time(utt.get("start", 0))
+            lines.append(f"[Спикер {utt.get('speaker')} | {start}] {utt.get('text', '')}")
+        text = "\n\n".join(lines)
+    else:
+        text = result.get("text") or ""
+
+    # Извлекаем название видео из URL для записи в историю
+    video_id = re.search(r'(?:v=|youtu\.be/)([\w\-]+)', url)
+    filename = f"youtube_{video_id.group(1) if video_id else 'video'}.mp3"
+
+    record = Transcription(
+        user_id=user.id,
+        filename=filename,
+        duration_seconds=duration_sec,
+        text=text,
+    )
+    db.add(record)
+    db.commit()
+    db.refresh(record)
+
+    used = get_used_minutes_this_month(user.id, db)
+    remaining = get_remaining_minutes(user, db)
+
+    return {
+        "id": record.id,
+        "text": text,
+        "duration_seconds": round(duration_sec, 1),
+        "used_minutes": round(used, 2),
+        "remaining_minutes": round(remaining, 2),
+    }
+
+
 @app.get("/api/history")
 def history(
     user: User = Depends(get_current_user),

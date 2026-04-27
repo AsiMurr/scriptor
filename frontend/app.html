@@ -45,6 +45,19 @@
     <section class="upload-panel">
       <h2>Транскрибация аудио и видео</h2>
 
+      <!-- Source tabs -->
+      <div class="source-tabs">
+        <button class="source-tab active" id="tab-file" onclick="switchTab('file')">📁 Файл</button>
+        <button class="source-tab" id="tab-youtube" onclick="switchTab('youtube')">▶️ YouTube</button>
+      </div>
+
+      <!-- YouTube URL input -->
+      <div id="youtube-panel" style="display:none">
+        <div class="yt-input-wrap">
+          <input type="text" id="yt-url" placeholder="https://youtube.com/watch?v=..." class="yt-input" oninput="onYtInput()" />
+        </div>
+      </div>
+
       <div class="drop-zone" id="drop-zone">
         <div class="drop-icon" id="drop-zone-icon">🎵</div>
         <p class="drop-text">Перетащи файл сюда или</p>

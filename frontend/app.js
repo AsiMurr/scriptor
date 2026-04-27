@@ -141,9 +141,35 @@ function clearFile() {
   document.getElementById('transcribe-btn').disabled = true;
 }
 
+// ── Source tabs ────────────────────────────────────────────────────
+
+let activeTab = 'file';
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.getElementById('tab-file').classList.toggle('active', tab === 'file');
+  document.getElementById('tab-youtube').classList.toggle('active', tab === 'youtube');
+  document.getElementById('drop-zone').style.display = tab === 'file' ? '' : 'none';
+  document.getElementById('youtube-panel').style.display = tab === 'youtube' ? '' : 'none';
+  const fileInfo = document.getElementById('file-info');
+  if (tab === 'youtube') fileInfo.style.display = 'none';
+  const btn = document.getElementById('transcribe-btn');
+  if (tab === 'youtube') {
+    btn.disabled = !document.getElementById('yt-url').value.trim();
+  } else {
+    btn.disabled = !selectedFile;
+  }
+}
+
+function onYtInput() {
+  const url = document.getElementById('yt-url').value.trim();
+  document.getElementById('transcribe-btn').disabled = !url;
+}
+
 // ── Transcribe ─────────────────────────────────────────────────────
 
 async function doTranscribe() {
+  if (activeTab === 'youtube') { await doTranscribeYoutube(); return; }
   if (!selectedFile) return;
 
   showProgress('Загрузка файла…', 20);
@@ -172,6 +198,49 @@ async function doTranscribe() {
     lastResultText = data.text;
     lastResultId = data.id;
     lastFilename = selectedFile?.name || 'transcription';
+    document.getElementById('result-text').value = data.text;
+    updateDownloadButtons(data.id);
+    renderSpeakerPanel(extractSpeakers(data.text));
+    document.getElementById('result-meta').textContent =
+      `Длительность: ${Math.round(data.duration_seconds)}с · Использовано: ${data.used_minutes} мин · Осталось: ${data.remaining_minutes} мин`;
+    showResult();
+    await loadUserInfo();
+    await loadHistory();
+  } catch (e) {
+    hideProgress();
+    document.getElementById('transcribe-btn').disabled = false;
+    showError('Ошибка сети. Проверь подключение.');
+  }
+}
+
+async function doTranscribeYoutube() {
+  const url = document.getElementById('yt-url').value.trim();
+  if (!url) return;
+
+  showProgress('Обработка YouTube…', 20);
+  hideResult(); hideError();
+  document.getElementById('transcribe-btn').disabled = true;
+
+  try {
+    setProgress(40, 'Транскрибация видео…');
+    const res = await authFetch(`${API}/api/transcribe-youtube`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+    });
+    const data = await res.json();
+
+    hideProgress();
+    document.getElementById('transcribe-btn').disabled = false;
+
+    if (!res.ok) {
+      showError(data.detail || 'Неизвестная ошибка');
+      return;
+    }
+
+    lastResultText = data.text;
+    lastResultId = data.id;
+    lastFilename = 'youtube_transcription';
     document.getElementById('result-text').value = data.text;
     updateDownloadButtons(data.id);
     renderSpeakerPanel(extractSpeakers(data.text));
