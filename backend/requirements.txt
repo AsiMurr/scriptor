@@ -15,4 +15,4 @@ python-docx
 fpdf2==2.7.9
 openpyxl
 psycopg2-binary
-yt-dlp
+yt-dlp>=2024.1.0
