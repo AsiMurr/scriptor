@@ -466,12 +466,50 @@ a:hover { text-decoration: underline; }
   background: var(--bg2); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 28px;
 }
-.source-tabs { display:flex; gap:8px; margin-bottom:16px; }
-.source-tab { flex:1; padding:8px 12px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--text2); font-size:14px; cursor:pointer; transition:all .2s; }
-.source-tab.active { background:var(--primary); color:#fff; border-color:var(--primary); }
-.yt-input-wrap { margin-bottom:12px; }
-.yt-input { width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--border); background:var(--bg3,#1a1a2e); color:var(--text); font-size:14px; outline:none; box-sizing:border-box; }
-.yt-input:focus { border-color:var(--primary); }
+/* ── Source Tabs ──────────────────────────────────────── */
+.source-tabs {
+  display: flex; gap: 10px; margin-bottom: 20px;
+  background: var(--bg3); border-radius: 12px; padding: 5px;
+  border: 1px solid var(--border);
+}
+.source-tab {
+  flex: 1; padding: 10px 16px; border-radius: 9px; border: none;
+  background: transparent; color: var(--text-muted);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: all .25s; font-family: inherit;
+  letter-spacing: 0.04em; display: flex; align-items: center;
+  justify-content: center; gap: 6px;
+}
+.source-tab:hover { color: var(--text); background: rgba(124,111,255,0.08); }
+.source-tab.active {
+  background: var(--primary); color: #fff;
+  box-shadow: 0 4px 16px var(--primary-glow);
+}
+
+/* ── YouTube Input ────────────────────────────────────── */
+.yt-input-wrap {
+  margin-bottom: 16px; position: relative;
+}
+.yt-input-wrap::before {
+  content: '▶'; position: absolute; left: 16px; top: 50%;
+  transform: translateY(-50%); font-size: 13px;
+  color: var(--text-muted); pointer-events: none;
+}
+.yt-input {
+  width: 100%; padding: 14px 16px 14px 40px;
+  border-radius: 12px; border: 1.5px solid var(--border);
+  background: var(--bg3); color: var(--text);
+  font-size: 14px; outline: none; box-sizing: border-box;
+  font-family: inherit; transition: border-color .25s, box-shadow .25s;
+}
+.yt-input::placeholder { color: var(--text-muted); }
+.yt-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+/* YouTube panel spacing */
+#youtube-panel { padding: 4px 0; }
 .upload-panel h2, .history-panel h3 { margin-bottom: 24px; font-weight: 700; }
 
 /* Drop zone */
