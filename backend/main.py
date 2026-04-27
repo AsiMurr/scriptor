@@ -762,6 +762,21 @@ def admin_test_email(to: str, token: str = "", db: Session = Depends(get_db)):
         return {"ok": False, "error": str(e)}
 
 
+@app.post("/api/admin/verify-user")
+def admin_verify_user(body: dict, token: str = "", db: Session = Depends(get_db)):
+    _check_admin(token)
+    email = body.get("email", "").strip().lower()
+    if not email:
+        raise HTTPException(status_code=400, detail="email required")
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.is_verified = True
+    user.verify_token = None
+    db.commit()
+    return {"ok": True, "email": user.email, "is_verified": True}
+
+
 @app.get("/api/admin/db-info")
 def admin_db_info(token: str = ""):
     _check_admin(token)
