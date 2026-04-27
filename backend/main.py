@@ -421,9 +421,8 @@ async def transcribe_youtube(
         import yt_dlp, tempfile, glob as glob_mod
         with tempfile.TemporaryDirectory() as tmpdir:
             opts = {
-                "format": "bestaudio/best",
+                "format": "bestaudio[ext=m4a]/bestaudio/best",
                 "outtmpl": f"{tmpdir}/audio.%(ext)s",
-                "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3", "preferredquality": "96"}],
                 "quiet": True,
                 "no_warnings": True,
                 "noplaylist": True,
