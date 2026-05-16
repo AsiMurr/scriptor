@@ -33,6 +33,48 @@ function openModal(form) {
   switchForm(form);
 }
 
+// Выбор тарифа: для залогиненного — создаёт платёж ЮКассы и редиректит,
+// для незалогиненного — открывает регистрацию и запоминает выбор
+async function selectPlan(plan) {
+  const token = localStorage.getItem('vt_token');
+  if (!token) {
+    sessionStorage.setItem('pending_plan', plan);
+    openModal('register');
+    return;
+  }
+  try {
+    const res = await fetch(`${API}/api/payment/create`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ plan }),
+    });
+    if (res.status === 401) {
+      localStorage.removeItem('vt_token');
+      sessionStorage.setItem('pending_plan', plan);
+      openModal('login');
+      return;
+    }
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.detail || 'Не удалось создать платёж');
+      return;
+    }
+    sessionStorage.setItem('last_payment_id', data.payment_id);
+    window.location.href = data.confirmation_url;
+  } catch (e) {
+    alert('Ошибка соединения: ' + e.message);
+  }
+}
+
+// После успешного логина — если есть отложенный тариф, запускаем оплату
+function resumePendingPlan() {
+  const pending = sessionStorage.getItem('pending_plan');
+  if (pending) {
+    sessionStorage.removeItem('pending_plan');
+    selectPlan(pending);
+  }
+}
+
 function closeModal() {
   document.getElementById('modal-overlay').classList.remove('open');
 }
@@ -69,6 +111,10 @@ async function doLogin() {
     }
     document.getElementById('resend-verify-wrap').style.display = 'none';
     localStorage.setItem('vt_token', data.access_token);
+    if (sessionStorage.getItem('pending_plan')) {
+      resumePendingPlan();
+      return;
+    }
     window.location.href = '/app';
   } catch {
     errEl.textContent = 'Ошибка сети. Попробуй снова.';

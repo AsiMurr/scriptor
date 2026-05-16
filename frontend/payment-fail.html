@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Оплата отменена — Scriptor</title>
+  <link rel="icon" type="image/svg+xml" href="/static/logo.svg">
+  <link rel="stylesheet" href="/static/style.css?v=3" />
+  <style>
+    .payment-result-wrap {
+      min-height: 70vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .payment-card {
+      max-width: 480px;
+      width: 100%;
+      background: #0e0e1a;
+      border: 1px solid #1e1e30;
+      border-radius: 16px;
+      padding: 40px 36px;
+      text-align: center;
+    }
+    .payment-icon {
+      font-size: 56px;
+      margin-bottom: 18px;
+      color: #FF6584;
+    }
+    .payment-card h1 { color: #eeeef8; font-size: 24px; margin: 0 0 12px; }
+    .payment-card p  { color: #9090b0; font-size: 15px; line-height: 1.6; margin: 0 0 24px; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="logo"><img src="/static/logo.svg" style="width:28px;height:28px;vertical-align:middle"> Scriptor</a>
+    </div>
+  </nav>
+  <main class="payment-result-wrap">
+    <div class="payment-card">
+      <div class="payment-icon">⚠</div>
+      <h1>Оплата не завершена</h1>
+      <p>Вы вернулись со страницы оплаты до её завершения. Если хотите попробовать снова — выберите тариф.</p>
+      <a href="/#pricing" class="btn btn-primary">К тарифам</a>
+    </div>
+  </main>
+</body>
+</html>

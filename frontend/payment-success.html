@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Оплата получена — Scriptor</title>
+  <link rel="icon" type="image/svg+xml" href="/static/logo.svg">
+  <link rel="stylesheet" href="/static/style.css?v=3" />
+  <style>
+    .payment-result-wrap {
+      min-height: 70vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .payment-card {
+      max-width: 480px;
+      width: 100%;
+      background: #0e0e1a;
+      border: 1px solid #1e1e30;
+      border-radius: 16px;
+      padding: 40px 36px;
+      text-align: center;
+    }
+    .payment-icon {
+      font-size: 56px;
+      margin-bottom: 18px;
+    }
+    .payment-card h1 {
+      color: #eeeef8;
+      font-size: 24px;
+      margin: 0 0 12px;
+    }
+    .payment-card p {
+      color: #9090b0;
+      font-size: 15px;
+      line-height: 1.6;
+      margin: 0 0 24px;
+    }
+    .payment-plan-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: linear-gradient(135deg, #7C6FFF, #FF6584);
+      color: #fff;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+    .payment-spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid #1e1e30;
+      border-top-color: #7C6FFF;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 18px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="logo"><img src="/static/logo.svg" style="width:28px;height:28px;vertical-align:middle"> Scriptor</a>
+    </div>
+  </nav>
+
+  <main class="payment-result-wrap">
+    <div class="payment-card" id="status-pending">
+      <div class="payment-spinner"></div>
+      <h1>Проверяем платёж…</h1>
+      <p>Это занимает несколько секунд. Не закрывайте страницу.</p>
+    </div>
+
+    <div class="payment-card" id="status-success" style="display:none">
+      <div class="payment-icon">✓</div>
+      <div class="payment-plan-badge" id="plan-badge"></div>
+      <h1>Оплата прошла успешно</h1>
+      <p>Ваш тариф активирован. Лимит обновился — приятной работы!</p>
+      <a href="/app" class="btn btn-primary btn-lg">Открыть приложение →</a>
+    </div>
+
+    <div class="payment-card" id="status-fail" style="display:none">
+      <div class="payment-icon" style="color:#FF6584">⚠</div>
+      <h1>Платёж не подтверждён</h1>
+      <p id="fail-message">Платёж не прошёл или был отменён. Если деньги списались — они вернутся автоматически в течение нескольких часов.</p>
+      <a href="/#pricing" class="btn btn-primary">К тарифам</a>
+    </div>
+  </main>
+
+  <script>
+    const token = localStorage.getItem('vt_token');
+    const paymentId = sessionStorage.getItem('last_payment_id');
+
+    const PLAN_NAMES = { standard: 'Стандарт', pro: 'Про' };
+
+    function showSuccess(plan) {
+      document.getElementById('status-pending').style.display = 'none';
+      document.getElementById('plan-badge').textContent = 'Тариф ' + (PLAN_NAMES[plan] || plan);
+      document.getElementById('status-success').style.display = '';
+      sessionStorage.removeItem('last_payment_id');
+    }
+
+    function showFail(msg) {
+      document.getElementById('status-pending').style.display = 'none';
+      if (msg) document.getElementById('fail-message').textContent = msg;
+      document.getElementById('status-fail').style.display = '';
+    }
+
+    async function pollStatus(attempt = 0) {
+      if (!paymentId || !token) {
+        showFail('Не удалось определить платёж. Проверьте «Мои тарифы» в личном кабинете.');
+        return;
+      }
+      try {
+        const res = await fetch(`/api/payment/status/${paymentId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) {
+          if (attempt < 20) return setTimeout(() => pollStatus(attempt + 1), 2000);
+          showFail();
+          return;
+        }
+        const data = await res.json();
+        if (data.status === 'succeeded') return showSuccess(data.plan);
+        if (data.status === 'canceled') return showFail();
+        // pending — ждём webhook ЮКассы (до ~60 секунд)
+        if (attempt < 30) return setTimeout(() => pollStatus(attempt + 1), 2000);
+        showFail('Платёж всё ещё в обработке. Если статус не сменится в течение 10 минут — напишите в поддержку.');
+      } catch {
+        if (attempt < 20) return setTimeout(() => pollStatus(attempt + 1), 2000);
+        showFail('Ошибка соединения');
+      }
+    }
+
+    pollStatus();
+  </script>
+</body>
+</html>

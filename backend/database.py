@@ -70,6 +70,19 @@ class ErrorLog(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+class Payment(Base):
+    __tablename__ = "payments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, nullable=False, index=True)
+    yk_payment_id = Column(String, unique=True, index=True, nullable=False)  # id из ЮКассы
+    plan = Column(String, nullable=False)            # standard | pro
+    amount = Column(Float, nullable=False)           # рубли
+    status = Column(String, default="pending")       # pending | succeeded | canceled
+    created_at = Column(DateTime, default=datetime.utcnow)
+    paid_at = Column(DateTime, nullable=True)
+
+
 def get_db():
     db = SessionLocal()
     try:

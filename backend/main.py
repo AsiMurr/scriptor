@@ -13,9 +13,10 @@ from email.mime.multipart import MIMEMultipart
 from collections import defaultdict
 import assemblyai as aai
 
-from database import get_db, User, Transcription, Feedback, ErrorLog, init_db, engine
+from database import get_db, User, Transcription, Feedback, ErrorLog, Payment, init_db, engine
 from auth import hash_password, verify_password, create_access_token, create_guest_token, get_current_user
 from usage import get_used_minutes_this_month, get_remaining_minutes, check_quota, PLAN_LIMITS, PLAN_FEATURES
+from payments import router as payments_router
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -31,6 +32,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(payments_router)
 
 
 # ─── Error logging middleware ─────────────────────────────────────────────────
@@ -484,7 +487,10 @@ async def transcribe_youtube(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Ошибка: {str(e)}")
+        err = str(e)
+        if "Sign in to confirm" in err or "bot" in err.lower():
+            raise HTTPException(status_code=503, detail="YouTube блокирует автоматические запросы. Скачайте видео вручную и загрузите файл.")
+        raise HTTPException(status_code=500, detail=f"Ошибка: {err}")
 
     duration_sec = result.get("audio_duration") or 0.0
     utterances = result.get("utterances") or []
@@ -961,7 +967,7 @@ def admin_stats(token: str = "", db: Session = Depends(get_db)):
     paid = db.query(User).filter(real, User.plan.in_(["standard", "pro"])).count()
     now = datetime.utcnow()
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    PLAN_PRICES = {"standard": 399, "pro": 890}
+    PLAN_PRICES = {"standard": 399, "pro": 1190}
     paid_this_month = db.query(User).filter(
         real,
         User.plan_paid_at >= month_start,
@@ -1109,6 +1115,14 @@ if frontend_path.exists():
     def admin_page():
         return FileResponse(str(frontend_path / "admin.html"))
 
+    @app.get("/payment-success", include_in_schema=False)
+    def payment_success_page():
+        return FileResponse(str(frontend_path / "payment-success.html"))
+
+    @app.get("/payment-fail", include_in_schema=False)
+    def payment_fail_page():
+        return FileResponse(str(frontend_path / "payment-fail.html"))
+
 
 # ─── Startup ─────────────────────────────────────────────────────────────────
 
@@ -1125,6 +1139,9 @@ def _run_migrations():
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS plan_paid_at TIMESTAMP",
         "CREATE TABLE IF NOT EXISTS error_logs (id SERIAL PRIMARY KEY, path TEXT, method TEXT, error TEXT, traceback TEXT, created_at TEXT)",
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_internal BOOLEAN DEFAULT FALSE",
+        "CREATE TABLE IF NOT EXISTS payments (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, yk_payment_id TEXT UNIQUE NOT NULL, plan TEXT NOT NULL, amount REAL NOT NULL, status TEXT DEFAULT 'pending', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, paid_at TIMESTAMP)",
+        "CREATE INDEX IF NOT EXISTS idx_payments_user_id ON payments(user_id)",
+        "CREATE INDEX IF NOT EXISTS idx_payments_yk_id ON payments(yk_payment_id)",
     ]
     results = []
     with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
